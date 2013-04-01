@@ -24,8 +24,8 @@ defaults:       # global defaults for all environments
   servers: [server1, server2, server3] # which servers to deploy the app on
   user:         # The username to connect with (must have SSH permissions)
   password:     # The password to use to connect (not necessary if you've set up SSH keys)
-  keyfile:      # A file containing a private key that allows the named user access to the server
-  key:          # A private key that allows the named user access to the server
+  keyfile:      # ...or a file containing a private key that allows the named user access to the server
+  key:          # ...or a private key that allows the named user access to the server
   path:         # absolute path to deploy the app on each server. %s will be translated to the application name
   database:     # the database.yml elements to write to the config folder
   env:          # contents of the .env file

@@ -39,15 +39,13 @@ production:     # deployment configuration for the production environment
 
 ### Environment
 
-Settings for the .env files and .foreman files in specific sections will add to the defaults specified earlier
-.env files will get a RAILS_ENV=environment entry (where environment is as specified here).
-You can override this by adding a different RAILS_ENV setting to this configuration here.
+Settings for the `.env` files and `.foreman` files in specific sections will add to the defaults specified earlier. `.env` files will get a `RAILS_ENV=environment` entry (where `environment` is as specified in `foreplay.yml`). You can override this by adding a different `RAILS_ENV` setting to this configuration here.
 
-The first instance of the first entry in Procfile that is instantiated by your Foreman concurrency settings will
-be started on port 50100 or 51100 and the external port 80 will be mapped to this port by iptables. You cannot
-configure the ports with this file. As an example, if your Procfile has a web entry on the first line and at
-least one web instance is configured in the .foreman concurrency setting then the first instance of your web
-process will be available on port 80.
+The first instance of the first entry in `Procfile` that is instantiated by your Foreman concurrency settings will
+be started on port 50100 or 51100 and the external port 80 will be mapped to this port by `iptables`. You cannot
+configure the ports yourself. As an example, if your `Procfile` has a `web` entry on the first line and at
+least one `web` instance is configured in the `.foreman` concurrency setting then the first instance of your `web`
+process will be available to the outside world on port 80.
 
 ### Path
 

@@ -14,6 +14,21 @@ or
 You can set the environment variables `ENV` and `ROLE` elsewhere if you wish.
 If `ROLE` is not defined then we deploy all roles.
 
+### How it works
+
+Foreplay does this:
+
+1.  Opens an SSH connection to the deloyment target
+2.  Grabs a copy of your code from the repository
+3.  Builds a `.env` file, a `.foreman` file and a `database.yml` file
+4.  Does a `bundle install`
+5.  Uses `foreman` to create an Upstart service (`foreman export`) for your app
+6.  Launches the app
+7.  Directs incoming traffic on port 80 to your app
+8.  If there's a previous instance of the app running, Foreplay shuts it down gracefully after it has switched `iptables` to the new instance
+
+There should be little or no downtime. If the app is b0rked then you can easily switch back to the previous instance: the Upstart service is still configured.
+
 ### foreplay.yml
 
 Format:

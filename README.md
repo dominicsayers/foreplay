@@ -51,8 +51,8 @@ process will be available on port 80.
 
 ### Path
 
-You can use `%u` in the path. This will be substituted with the `user` value
-You can use `%a` in the path. This will be substituted with the `app` name
+You can use `%u` in the path. This will be substituted with the `user` value. You can use `%a` in the path. This will be substituted with the app's `name`
+
 Example:
 
     user: fred

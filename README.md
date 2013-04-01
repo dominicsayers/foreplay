@@ -72,7 +72,7 @@ Example:
     name: myapp
     path: /home/%u/apps/%a
 
-Dependencies:
+### Dependencies
 
 ```ruby
 gem 'foreman'

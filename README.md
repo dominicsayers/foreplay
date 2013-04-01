@@ -9,7 +9,7 @@ Foreplay: deploying Rails projects to Ubuntu using Foreman
 
 or
 
-    ENV=production ROLE=web foreplay:push
+    ENV=production ROLE=web rake foreplay:push
 
 You can set the environment variables `ENV` and `ROLE` elsewhere if you wish.
 If `ROLE` is not defined then we deploy all roles.

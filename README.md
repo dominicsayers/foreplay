@@ -75,13 +75,15 @@ Example:
 Dependencies:
 
 ```ruby
+gem 'foreman'
 gem 'net-ssh-shell'
 ```
 
-You can constrain this to whatever group you use for initiating deployments, e.g.
+You can constrain this to whatever groups you use for initiating deployments, e.g.
 
 ```ruby
-group :development do
+group :development, :test do
+  gem 'foreman'
   gem 'net-ssh-shell'
 end
 ```

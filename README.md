@@ -5,9 +5,11 @@ Foreplay: deploying Rails projects to Ubuntu using Foreman
 
 ### Using foreplay
 
-    ```
-    rake ENV=production foreplay:push
-    ```
+    ENV=production rake foreplay:push
+
+or
+
+    ENV=production ROLE=web foreplay:push
 
 You can set the environment variables `ENV` and `ROLE` elsewhere if you wish.
 If `ROLE` is not defined then we deploy all roles.
@@ -53,22 +55,20 @@ You can use `%u` in the path. This will be substituted with the `user` value
 You can use `%a` in the path. This will be substituted with the `app` name
 Example:
 
-    ```
     user: fred
     name: myapp
     path: /home/%u/apps/%a
-    ```
 
 Dependencies:
 
-    ```ruby
-   gem 'net-ssh-shell'
-   ```
+```ruby
+gem 'net-ssh-shell'
+```
 
 You can constrain this to whatever group you use for initiating deployments, e.g.
 
-    ```ruby
-    group :development do
-      gem 'net-ssh-shell'
-    end
-    ```
+```ruby
+group :development do
+  gem 'net-ssh-shell'
+end
+```

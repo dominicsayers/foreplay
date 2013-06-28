@@ -54,6 +54,15 @@ defaults:
     username: %q{TODO: Add the database user}
     password: %q{TODO: Add the database user's password}
 production:
+  defaults:
+    database:
+      adapter: postgresql
+      encoding: utf8
+      database: %q{TODO: Add the database name}
+      pool: 5
+      host: %q{TODO: Add the database host name}
+      username: %q{TODO: Add the database user}
+      password: %q{TODO: Add the database user's password}
   web:
     servers: [%q{TODO: Add the name of the production web server}]
     foreman:

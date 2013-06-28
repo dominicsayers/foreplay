@@ -6,4 +6,4 @@ Feature: Setup
   Scenario: Setup
     When I run `foreplay setup`
     Then the following files should exist:
-    	| config/foreplay.yml |
+      | config/foreplay.yml |

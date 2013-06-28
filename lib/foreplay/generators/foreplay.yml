@@ -41,26 +41,20 @@
 #     path: /home/%u/apps/%a
 #
 defaults:
-  repository: git@github.com:Xenapto/xendata.git
-  user: xenapto
-  keyfile: ~/.ssh/id_circleci_github
-  path: apps/%a
+  repository: %q{TODO: Add the git repository path}
+  user: %q{TODO: Add the user to logon to the deployment server}
+  password: %q{TODO: Add the password for the user on the deployment server}
+  path: %q{TODO: Add the path to deploy to on the deployment server}
   database:
     adapter: postgresql
     encoding: utf8
-    database: xendata
+    database: %q{TODO: Add the database name}
     pool: 5
-    host: db2.xenapto.net
-    username: postgres
-    password: nose-onto-be-remarkable
-xendata:
-#  web:
-#    servers: [web3.xenapto.net]
-#    foreman:
-#      concurrency: 'web=1,worker=0,scheduler=0'
-  worker:
-    servers: [web3.xenapto.net]
-    env:
-      QUEUE: 'immediate,regular,background'
+    host: %q{TODO: Add the database host name}
+    username: %q{TODO: Add the database user}
+    password: %q{TODO: Add the database user's password}
+production:
+  web:
+    servers: [%q{TODO: Add the name of the production web server}]
     foreman:
-      concurrency: 'resque_web=1,worker=2,scheduler=1'
+      concurrency: 'web=1,worker=0,scheduler=0'

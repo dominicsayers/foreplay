@@ -17,7 +17,7 @@ pickle-email-*.html
 
 *.gem
 .bundle
-.config
+/config
 .yardoc
 Gemfile.lock
 InstalledFiles
@@ -31,4 +31,3 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
-config

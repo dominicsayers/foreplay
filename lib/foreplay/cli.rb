@@ -1,17 +1,24 @@
 require 'thor'
 require 'foreplay'
-require 'foreplay/setup'
 
 module Foreplay
   class CLI < Thor
-    desc 'check', 'Checks if configuration is OK'
+    desc 'deploy', 'Deploys to specified environment'
 
-    method_option :environment, :aliases => '-e'
     method_option :role,        :aliases => '-r'
     method_option :server,      :aliases => '-s'
 
-    def check
-      puts Foreplay::Config.check options
+    def deploy(environment)
+      Foreplay::Deploy.start [:deploy, environment, options]
+    end
+
+    desc 'check', 'Checks if configuration is OK for specified environment'
+
+    method_option :role,        :aliases => '-r'
+    method_option :server,      :aliases => '-s'
+
+    def check(environment)
+      Foreplay::Deploy.start [:check, environment, options]
     end
 
     desc 'setup', 'Create the Foreplay config file'
@@ -19,8 +26,9 @@ module Foreplay
     method_option :name,        :aliases => '-n'
     method_option :repository,  :aliases => '-r'
     method_option :user,        :aliases => '-u'
-    method_option :password,    :aliases => '-p'
+    method_option :password
     method_option :path,        :aliases => '-f'
+    method_option :port,        :aliases => '-p', :type => :numeric
     method_option :servers,     :aliases => '-s', :type => :array
     method_option :db_adapter,  :aliases => '-a'
     method_option :db_encoding, :aliases => '-e'

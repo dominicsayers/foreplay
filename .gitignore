@@ -1,3 +1,4 @@
+*.TMP
 *.rbc
 *.sassc
 .sass-cache

@@ -43,8 +43,7 @@
 #
 # value         Normally defined as  Notes
 # ------------- -------------------- -------------------------------------------------------------------
-# name:         Global default       App name (if omitted then
-#                                    Rails.application.class.parent_name.underscore is used)
+# name:         Global default       App name (if omitted then current folder name is used)
 # user:         Global default       The username to connect with (must have SSH permissions)
 # password:     Global default       The password to use to connect (not necessary if you've set up SSH
 #                                    keys - see below)
@@ -54,6 +53,9 @@
 # path:         Global default       An absolute path to deploy the app on each server. %a will be
 #                                    translated to the application name. %u will be translated to the
 #                                    login user name
+# port:         Global default       The base port for the web app to listen on. Port 80 will be
+#                                    mapped to this port so it's usually OK to leave this at the
+#                                    default value of 50000.
 # database:     Environment default  The database.yml elements to write to the config folder
 #   key: value
 # servers: [server1, server2, server3]
@@ -69,6 +71,7 @@ defaults:
   user: <%= @options.user? ? @options.user : '%q{TODO: Add the user to logon to the deployment server}' %>
   password: <%= @options.password? ? @options.password : '%q{TODO: Add the password for the user on the deployment server}' %>
   path: <%= @options.path? ? @options.path : '%q{TODO: Add the path to deploy to on the deployment server}' %>
+  port: <%= @options.port %>
 production:
   defaults:
     database:

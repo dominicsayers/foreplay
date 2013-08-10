@@ -1,7 +1,7 @@
-Feature: Config
-  In order to configure Foreplay
-  As a CLI
-  I want to be as usable as possible
+Feature: Deploy
+  In order to use Foreplay
+  From the CLI
+  I want to be able to access all features
 
   Scenario: Check configuration
     When I run `foreplay check`
@@ -12,15 +12,15 @@ Feature: Config
     Then the output should contain:
     	"""
     	ERROR: foreplay check was called with arguments ["--invalid", "xyz"]
-		Usage: "foreplay check".
+		  Usage: "foreplay check".
     	"""
 
   Scenario: Check configuration parameters - short invalid parameter
     When I run `foreplay check -x xyz`
     Then the output should contain:
-    	"""
-		ERROR: foreplay check was called with arguments ["-x", "xyz"]
-		Usage: "foreplay check".
+      """
+		  ERROR: foreplay check was called with arguments ["-x", "xyz"]
+		  Usage: "foreplay check".
     	"""
 
   Scenario: Check configuration parameters - environment parameter

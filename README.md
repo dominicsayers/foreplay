@@ -1,9 +1,22 @@
-Foreplay
-========
+# Foreplay
 
 Foreplay: deploying Rails projects to Ubuntu using Foreman
 
-### Using foreplay
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'foreplay'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install foreplay
+
+## Usage
 
     ENV=production rake foreplay:push
 
@@ -39,9 +52,9 @@ defaults:       # global defaults for all environments
   servers: [server1, server2, server3] # which servers to deploy the app on
   user:         # The username to connect with (must have SSH permissions)
   password:     # The password to use to connect (not necessary if you've set up SSH keys)
-  keyfile:      # ...or a file containing a private key that allows the named user access to the server
+  keyfile:      # or a file containing a private key that allows the named user access to the server
   key:          # ...or a private key that allows the named user access to the server
-  path:         # absolute path to deploy the app on each server. %s will be translated to the application name
+  path:         # absolute path to deploy the app on each server. %s will substitute to the app name
   database:     # the database.yml elements to write to the config folder
   env:          # contents of the .env file
     key: value  # will go into the .env file as key=value
@@ -49,7 +62,7 @@ defaults:       # global defaults for all environments
     key: value  # will go into the .foreman file as key: value
 production:     # deployment configuration for the production environment
   defaults:     # defaults for all roles in this environment (structure same as global defaults)
-  role1:        # settings for the a particular role (e.g. web, worker, etc.) (structure same as global defaults)
+  role1:        # settings for the a particular role (e.g. web, worker, etc.)
 ```
 
 ### Environment
@@ -87,3 +100,11 @@ group :development, :test do
   gem 'net-ssh-shell'
 end
 ```
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request

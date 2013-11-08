@@ -36,15 +36,16 @@ Feature: Deploy
       And the output should contain "Can't find configuration file"
 
   Scenario: Check configuration parameters
-    Given I have configured Foreplay
-    When I run `foreplay check production`
-    Then the following files should exist:
-      | config/foreplay.yml |
+    When I run `foreplay setup`
+      And I run `foreplay check production`
+    Then the output should contain "create  config/foreplay.yml"
       And the output should contain "Checking"
       And the output should contain "production environment"
       And the output should contain "all roles"
       And the output should contain "all servers"
       And the output should not contain "Can't find configuration file"
+      And the following files should exist:
+        | config/foreplay.yml |
 
   Scenario: Check configuration parameters - role parameter
     When I run `foreplay check production --role worker`

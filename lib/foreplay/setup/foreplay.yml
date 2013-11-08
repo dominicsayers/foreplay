@@ -66,23 +66,23 @@
 #   key: value
 #
 defaults:
-  name: <%= @options.name? ? @options.name : '%q{TODO: Add the app name}' %>
-  repository: <%= @options.repository? ? @options.repository : '%q{TODO: Add the git repository path}' %>
-  user: <%= @options.user? ? @options.user : '%q{TODO: Add the user to logon to the deployment server}' %>
-  password: <%= @options.password? ? @options.password : '%q{TODO: Add the password for the user on the deployment server}' %>
-  path: <%= @options.path? ? @options.path : '%q{TODO: Add the path to deploy to on the deployment server}' %>
+  name: <%= @options.name? ? @options.name : 'TODO Put the app name here' %>
+  repository: <%= @options.repository? ? @options.repository : 'TODO Put the git repository path here' %>
+  user: <%= @options.user? ? @options.user : 'TODO Put here the user to logon to the deployment server' %>
+  password: <%= @options.password? ? @options.password : 'TODO Put here the password for the user on the deployment server' %>
+  path: <%= @options.path? ? @options.path : 'TODO Put here the path to deploy to on the deployment server' %>
   port: <%= @options.port %>
 production:
   defaults:
     database:
       adapter: <%= @options.db_adapter %>
       encoding: <%= @options.db_encoding %>
-      database: <%= @options.db_name? ? @options.db_name : '%q{TODO: Add the database name}' %>
+      database: <%= @options.db_name? ? @options.db_name : 'TODO Put the database name here' %>
       pool: <%= @options.db_pool %>
-      host: <%= @options.db_host? ? @options.db_host : '%q{TODO: Add the database host name}' %>
-      username: <%= @options.db_user? ? @options.db_user : '%q{TODO: Add the database user}' %>
-      password: <%= @options.db_password? ? @options.db_password : '%q{TODO: Add the database user\'s password}' %>
+      host: <%= @options.db_host? ? @options.db_host : 'TODO Put here the database host name' %>
+      username: <%= @options.db_user? ? @options.db_user : 'TODO Put here the database user' %>
+      password: <%= @options.db_password? ? @options.db_password : 'TODO Put here the database user\'s password' %>
   web:
-    servers: <%= @options.servers? ? @options.servers : '[%q{TODO: Add the name of the production web server}]' %>
+    servers: <%= @options.servers? ? @options.servers : '[TODO Put here the name or names of the production web servers]' %>
     foreman:
       concurrency: 'web=1,worker=0,scheduler=0'

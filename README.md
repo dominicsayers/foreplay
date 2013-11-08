@@ -52,9 +52,9 @@ defaults:       # global defaults for all environments
   servers: [server1, server2, server3] # which servers to deploy the app on
   user:         # The username to connect with (must have SSH permissions)
   password:     # The password to use to connect (not necessary if you've set up SSH keys)
-  keyfile:      # ...or a file containing a private key that allows the named user access to the server
+  keyfile:      # or a file containing a private key that allows the named user access to the server
   key:          # ...or a private key that allows the named user access to the server
-  path:         # absolute path to deploy the app on each server. %s will be translated to the application name
+  path:         # absolute path to deploy the app on each server. %s will substitute to the app name
   database:     # the database.yml elements to write to the config folder
   env:          # contents of the .env file
     key: value  # will go into the .env file as key=value
@@ -62,7 +62,7 @@ defaults:       # global defaults for all environments
     key: value  # will go into the .foreman file as key: value
 production:     # deployment configuration for the production environment
   defaults:     # defaults for all roles in this environment (structure same as global defaults)
-  role1:        # settings for the a particular role (e.g. web, worker, etc.) (structure same as global defaults)
+  role1:        # settings for the a particular role (e.g. web, worker, etc.)
 ```
 
 ### Environment

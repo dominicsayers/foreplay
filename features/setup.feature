@@ -12,23 +12,23 @@ Feature: Setup
 		"""
 		defaults:
 		  name: aruba
-		  repository: %q{TODO: Add the git repository path}
-		  user: %q{TODO: Add the user to logon to the deployment server}
-		  password: %q{TODO: Add the password for the user on the deployment server}
-		  path: %q{TODO: Add the path to deploy to on the deployment server}
+		  repository: TODO Put the git repository path here
+		  user: TODO Put here the user to logon to the deployment server
+		  password: TODO Put here the password for the user on the deployment server
+		  path: TODO Put here the path to deploy to on the deployment server
 		  port: 50000
 		production:
 		  defaults:
 		    database:
 		      adapter: postgresql
 		      encoding: utf8
-		      database: %q{TODO: Add the database name}
+		      database: TODO Put the database name here
 		      pool: 5
-		      host: %q{TODO: Add the database host name}
-		      username: %q{TODO: Add the database user}
-		      password: %q{TODO: Add the database user's password}
+		      host: TODO Put here the database host name
+		      username: TODO Put here the database user
+		      password: TODO Put here the database user's password
 		  web:
-		    servers: [%q{TODO: Add the name of the production web server}]
+		    servers: [TODO Put here the name or names of the production web servers]
 		    foreman:
 		      concurrency: 'web=1,worker=0,scheduler=0'
 		"""

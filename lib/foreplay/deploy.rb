@@ -79,7 +79,6 @@ module Foreplay
 
     def deploy_to_server server, instructions
       name        = instructions[:name]
-#      environment = instructions[:environment]
       role        = instructions[:role]
       path        = instructions[:path]
       repository  = instructions[:repository]
@@ -92,8 +91,8 @@ module Foreplay
       puts "#{mode.capitalize}ing #{name.yellow} #{preposition} #{server.yellow} in the #{role.dup.yellow} role on the #{environment.dup.yellow} environment"
 
       # Substitute variables in the path
-      path.sub! '%u', user
-      path.sub! '%a', name
+      path.gsub! '%u', user
+      path.gsub! '%a', name
 
       # Find out which port we're currently running on
       steps = [ { :command => 'mkdir -p .foreplay && touch .foreplay/current_port && cat .foreplay/current_port', :silent => true } ]
@@ -161,6 +160,8 @@ module Foreplay
           :ignore_error => true },
         { :command      => "sudo iptables-save > /etc/iptables/rules.v4",
           :commentary   => "Saving iptables rules to /etc/iptables/rules.v4" },
+        { :command      => "sudo iptables-save > /etc/iptables.up.rules",
+          :commentary   => "Saving iptables rules to /etc/iptables.up.rules" },
         { :command      => "sudo iptables-save -c | egrep REDIRECT --color=never",
           :ignore_error => true,
           :commentary   => "Current firewall NAT configuration:" },

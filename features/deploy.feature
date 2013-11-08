@@ -5,62 +5,71 @@ Feature: Deploy
 
   Scenario: Check configuration
     When I run `foreplay check`
-    Then the output should contain "OK"
+    Then the output should contain:
+        """
+        ERROR: foreplay check was called with no arguments
+        Usage: "foreplay check ENVIRONMENT".
+        """
 
   Scenario: Check configuration parameters - invalid parameter
-    When I run `foreplay check --invalid xyz`
+    When I run `foreplay check production --invalid xyz`
     Then the output should contain:
     	"""
-    	ERROR: foreplay check was called with arguments ["--invalid", "xyz"]
-		  Usage: "foreplay check".
+    	ERROR: foreplay check was called with arguments ["production", "--invalid", "xyz"]
+		  Usage: "foreplay check ENVIRONMENT".
     	"""
 
   Scenario: Check configuration parameters - short invalid parameter
-    When I run `foreplay check -x xyz`
+    When I run `foreplay check production -x xyz`
     Then the output should contain:
       """
-		  ERROR: foreplay check was called with arguments ["-x", "xyz"]
-		  Usage: "foreplay check".
+		  ERROR: foreplay check was called with arguments ["production", "-x", "xyz"]
+		  Usage: "foreplay check ENVIRONMENT".
     	"""
 
-  Scenario: Check configuration parameters - environment parameter
-    When I run `foreplay check --environment production`
-    Then the output should contain "Checking configuration for"
-    And the output should contain "production environment"
-    And the output should contain "all roles"
-    And the output should contain "all servers"
+  Scenario: Check configuration parameters - no config file
+    When I run `foreplay check production`
+    Then the output should contain "Checking"
+      And the output should contain "production environment"
+      And the output should contain "all roles"
+      And the output should contain "all servers"
+      And the output should contain "Can't find configuration file"
+
+  Scenario: Check configuration parameters
+    Given I have configured Foreplay
+    When I run `foreplay check production`
+    Then the following files should exist:
+      | config/foreplay.yml |
+      And the output should contain "Checking"
+      And the output should contain "production environment"
+      And the output should contain "all roles"
+      And the output should contain "all servers"
+      And the output should not contain "Can't find configuration file"
 
   Scenario: Check configuration parameters - role parameter
-    When I run `foreplay check --role worker`
-    Then the output should contain "Checking configuration for"
-    And the output should contain "all environments"
-    And the output should contain "worker role"
-    And the output should contain "all servers"
+    When I run `foreplay check production --role worker`
+    Then the output should contain "Checking"
+      And the output should contain "production environment"
+      And the output should contain "worker role"
+      And the output should contain "all servers"
 
   Scenario: Check configuration parameters - server parameter
-    When I run `foreplay check --server worker.example.com`
-    Then the output should contain "Checking configuration for"
-    And the output should contain "all environments"
-    And the output should contain "all roles"
-    And the output should contain "worker.example.com server"
-
-  Scenario: Check configuration parameters - short environment parameter
-    When I run `foreplay check -e production`
-    Then the output should contain "Checking configuration for"
-    And the output should contain "production environment"
-    And the output should contain "all roles"
-    And the output should contain "all servers"
+    When I run `foreplay check production --server worker.example.com`
+    Then the output should contain "Checking"
+      And the output should contain "production environment"
+      And the output should contain "all roles"
+      And the output should contain "worker.example.com server"
 
   Scenario: Check configuration parameters - short role parameter
-    When I run `foreplay check -r worker`
-    Then the output should contain "Checking configuration for"
-    And the output should contain "all environments"
-    And the output should contain "worker role"
-    And the output should contain "all servers"
+    When I run `foreplay check production -r worker`
+    Then the output should contain "Checking"
+      And the output should contain "production environment"
+      And the output should contain "worker role"
+      And the output should contain "all servers"
 
   Scenario: Check configuration parameters - short server parameter
-    When I run `foreplay check -s worker.example.com`
-    Then the output should contain "Checking configuration for"
-    And the output should contain "all environments"
-    And the output should contain "all roles"
-    And the output should contain "worker.example.com server"
+    When I run `foreplay check production -s worker.example.com`
+    Then the output should contain "Checking"
+      And the output should contain "production environment"
+      And the output should contain "all roles"
+      And the output should contain "worker.example.com server"

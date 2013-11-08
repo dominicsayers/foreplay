@@ -3,7 +3,7 @@ require 'foreplay'
 
 module Foreplay
   class CLI < Thor
-    desc 'deploy', 'Deploys to specified environment'
+    desc 'deploy ENVIRONMENT', 'Deploys to specified environment'
 
     method_option :role,        :aliases => '-r'
     method_option :server,      :aliases => '-s'
@@ -12,7 +12,7 @@ module Foreplay
       Foreplay::Deploy.start [:deploy, environment, options]
     end
 
-    desc 'check', 'Checks if configuration is OK for specified environment'
+    desc 'check ENVIRONMENT', 'Checks if configuration is OK for specified environment'
 
     method_option :role,        :aliases => '-r'
     method_option :server,      :aliases => '-s'

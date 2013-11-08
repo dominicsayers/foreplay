@@ -25,12 +25,19 @@ module Foreplay
         explanatory_text(filters.server, 'server')
       ]
 
-      config_yml = "#{Dir.getwd}/config/foreplay.yml"
-      config_all = YAML.load(File.read(config_yml))
+      config_file = "#{Dir.getwd}/config/foreplay.yml"
+
+      begin
+        config_yml = File.read config_file
+      rescue Errno::ENOENT
+        terminate "Can't find configuration file #{config_file}"
+      end
+
+      config_all = YAML.load(config_yml)
       config_env = config_all[environment]
 
       # This environment
-      terminate("No deployment configuration defined for #{environment} environment.\nCheck #{config_yml}") unless config_all.has_key? environment
+      terminate("No deployment configuration defined for #{environment} environment.\nCheck #{config_file}") unless config_all.has_key? environment
 
       # Establish defaults
       # First the default defaults
@@ -52,7 +59,7 @@ module Foreplay
         instructions[:role] = role
         required_keys       = [:name, :environment, :role, :servers, :path, :repository]
 
-        required_keys.each { |key| terminate("Required key #{key} not found in instructions for #{environment} environment.\nCheck #{config_yml}") unless instructions.has_key? key }
+        required_keys.each { |key| terminate("Required key #{key} not found in instructions for #{environment} environment.\nCheck #{config_file}") unless instructions.has_key? key }
 
         deploy_role instructions
       end
@@ -152,7 +159,9 @@ module Foreplay
         { :command      => "sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port #{former_port.to_i + 100}",
           :commentary   => "Removing previous firewall directing traffic to port #{former_port}",
           :ignore_error => true },
-        { :command      => "sudo iptables -t nat -L | grep REDIRECT",
+        { :command      => "sudo iptables-save > /etc/iptables/rules.v4",
+          :commentary   => "Saving iptables rules to /etc/iptables/rules.v4" },
+        { :command      => "sudo iptables-save -c | egrep REDIRECT --color=never",
           :ignore_error => true,
           :commentary   => "Current firewall NAT configuration:" },
         { :command      => "sudo stop #{former_service} || echo 'No previous instance running'",
@@ -300,8 +309,7 @@ module Foreplay
     end
 
     def terminate(message)
-      puts message.red
-      exit!
+      abort message.red
     end
   end
 end

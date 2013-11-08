@@ -1,76 +1,96 @@
-Feature: Deploy
-  In order to use Foreplay
+Feature: deploy
+  In order to deploy my app
   From the CLI
-  I want to be able to access all features
+  I want to be able to use all features
 
-  Scenario: Check configuration
-    When I run `foreplay check`
+  Scenario: No arguments
+    When I run `foreplay deploy`
     Then the output should contain:
         """
-        ERROR: foreplay check was called with no arguments
-        Usage: "foreplay check ENVIRONMENT".
+        ERROR: foreplay deploy was called with no arguments
+        Usage: "foreplay deploy ENVIRONMENT".
         """
 
-  Scenario: Check configuration parameters - invalid parameter
-    When I run `foreplay check production --invalid xyz`
+  Scenario: invalid parameter
+    When I run `foreplay deploy test --invalid xyz`
     Then the output should contain:
     	"""
-    	ERROR: foreplay check was called with arguments ["production", "--invalid", "xyz"]
-		  Usage: "foreplay check ENVIRONMENT".
+    	ERROR: foreplay deploy was called with arguments ["test", "--invalid", "xyz"]
+		  Usage: "foreplay deploy ENVIRONMENT".
     	"""
 
-  Scenario: Check configuration parameters - short invalid parameter
-    When I run `foreplay check production -x xyz`
+  Scenario: short invalid parameter
+    When I run `foreplay deploy test -x xyz`
     Then the output should contain:
       """
-		  ERROR: foreplay check was called with arguments ["production", "-x", "xyz"]
-		  Usage: "foreplay check ENVIRONMENT".
+		  ERROR: foreplay deploy was called with arguments ["test", "-x", "xyz"]
+		  Usage: "foreplay deploy ENVIRONMENT".
     	"""
 
-  Scenario: Check configuration parameters - no config file
-    When I run `foreplay check production`
-    Then the output should contain "Checking"
-      And the output should contain "production environment"
+  Scenario: no config file
+    When I run `foreplay deploy test`
+    Then the output should contain "Deploying"
+      And the output should contain "test environment"
       And the output should contain "all roles"
       And the output should contain "all servers"
       And the output should contain "Can't find configuration file"
 
-  Scenario: Check configuration parameters
+  Scenario: deploy all roles
     When I run `foreplay setup`
-      And I run `foreplay check production`
+      And I run `foreplay deploy test`
     Then the output should contain "create  config/foreplay.yml"
-      And the output should contain "Checking"
-      And the output should contain "production environment"
+      And the output should contain "Deploying"
+      And the output should contain "test environment"
+      And the output should contain "all roles"
+      And the output should contain "all servers"
+      And the output should contain "No deployment configuration defined for test environment"
+      And the output should not contain "Can't find configuration file"
+      And the following files should exist:
+        | config/foreplay.yml |
+
+  Scenario: deploy one role
+    When I run `foreplay deploy test --role worker`
+    Then the output should contain "Deploying"
+      And the output should contain "test environment"
+      And the output should contain "worker role"
+      And the output should contain "all servers"
+
+  Scenario: deploy to one server
+    When I run `foreplay deploy test --server worker.example.com`
+    Then the output should contain "Deploying"
+      And the output should contain "test environment"
+      And the output should contain "all roles"
+      And the output should contain "worker.example.com server"
+
+  Scenario: deploy to one role - short role parameter
+    When I run `foreplay deploy test -r worker`
+    Then the output should contain "Deploying"
+      And the output should contain "test environment"
+      And the output should contain "worker role"
+      And the output should contain "all servers"
+
+  Scenario: deployto one server - short server parameter
+    When I run `foreplay deploy test -s worker.example.com`
+    Then the output should contain "Deploying"
+      And the output should contain "test environment"
+      And the output should contain "all roles"
+      And the output should contain "worker.example.com server"
+
+  Scenario: deploy all roles
+    When I run `foreplay setup`
+      And I run `foreplay deploy test`
+    Then the output should contain "create  config/foreplay.yml"
+      And the output should contain "Deploying"
+      And the output should contain "test environment"
       And the output should contain "all roles"
       And the output should contain "all servers"
       And the output should not contain "Can't find configuration file"
       And the following files should exist:
         | config/foreplay.yml |
 
-  Scenario: Check configuration parameters - role parameter
-    When I run `foreplay check production --role worker`
-    Then the output should contain "Checking"
-      And the output should contain "production environment"
-      And the output should contain "worker role"
-      And the output should contain "all servers"
-
-  Scenario: Check configuration parameters - server parameter
-    When I run `foreplay check production --server worker.example.com`
-    Then the output should contain "Checking"
-      And the output should contain "production environment"
-      And the output should contain "all roles"
-      And the output should contain "worker.example.com server"
-
-  Scenario: Check configuration parameters - short role parameter
-    When I run `foreplay check production -r worker`
-    Then the output should contain "Checking"
-      And the output should contain "production environment"
-      And the output should contain "worker role"
-      And the output should contain "all servers"
-
-  Scenario: Check configuration parameters - short server parameter
-    When I run `foreplay check production -s worker.example.com`
-    Then the output should contain "Checking"
-      And the output should contain "production environment"
-      And the output should contain "all roles"
-      And the output should contain "worker.example.com server"
+  Scenario: deploy
+    When I run `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com`
+      And I run `foreplay deploy production`
+    Then the output should contain "Deploying aruba to web.example.com in the web role on the production environment"
+      And the output should contain "Connecting to web.example.com"
+      And the output should contain "There was a problem starting an ssh session on web.example.com"

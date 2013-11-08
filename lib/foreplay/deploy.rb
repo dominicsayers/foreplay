@@ -12,7 +12,7 @@ module Foreplay
 
     argument :mode,         :type => :string, :required => true
     argument :environment,  :type => :string, :required => true
-    argument :filters,      :type => :hash
+    argument :filters,      :type => :hash,   :required => false
 
     DEFAULTS_KEY = 'defaults'
 
@@ -21,8 +21,8 @@ module Foreplay
       puts '%sing %s environment, %s, %s' % [
         mode.capitalize,
         environment.dup.yellow,
-        explanatory_text(filters.role, 'role'),
-        explanatory_text(filters.server, 'server')
+        explanatory_text(filters, 'role'),
+        explanatory_text(filters, 'server')
       ]
 
       config_file = "#{Dir.getwd}/config/foreplay.yml"
@@ -30,11 +30,11 @@ module Foreplay
       begin
         config_yml = File.read config_file
       rescue Errno::ENOENT
-        terminate "Can't find configuration file #{config_file}"
+        terminate "Can't find configuration file #{config_file}.\nPlease run foreplay setup or create the file manually."
       end
 
       config_all = YAML.load(config_yml)
-      config_env = config_all[environment]
+      config_env = config_all[environment] || {}
 
       # This environment
       terminate("No deployment configuration defined for #{environment} environment.\nCheck #{config_file}") unless config_all.has_key? environment
@@ -53,12 +53,11 @@ module Foreplay
 
       config_env.each do |role, additional_instructions|
         next if role == DEFAULTS_KEY # 'defaults' is not a role
-        next unless filters.role.blank? || filters.role == role # Only deploy to the role we've specified (or all roles if none is specified)
+        next if filters.has_key?('role') && filters['role'] != role # Only deploy to the role we've specified (or all roles if none is specified)
 
         instructions        = deep_merge_with_arrays(defaults, additional_instructions).symbolize_keys
         instructions[:role] = role
         required_keys       = [:name, :environment, :role, :servers, :path, :repository]
-
         required_keys.each { |key| terminate("Required key #{key} not found in instructions for #{environment} environment.\nCheck #{config_file}") unless instructions.has_key? key }
 
         deploy_role instructions
@@ -305,8 +304,8 @@ module Foreplay
       new_hash
     end
 
-    def explanatory_text(value, singular_word)
-      value.blank? ? "all #{singular_word.pluralize}" : "#{value.dup.yellow} #{singular_word}"
+    def explanatory_text(hsh, key)
+      hsh.has_key?(key) ? "#{hsh[key].dup.yellow} #{key}" : "all #{key.pluralize}"
     end
 
     def terminate(message)

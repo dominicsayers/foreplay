@@ -89,7 +89,7 @@ Feature: deploy
         | config/foreplay.yml |
 
   Scenario: deploy
-    When I run `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com`
+    When I run `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com --password "top-secret"`
       And I run `foreplay deploy production`
     Then the output should contain "Deploying aruba to web.example.com in the web role on the production environment"
       And the output should contain "Connecting to web.example.com"

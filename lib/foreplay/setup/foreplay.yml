@@ -68,8 +68,7 @@
 defaults:
   name: <%= @options.name? ? @options.name : 'TODO Put the app name here' %>
   repository: <%= @options.repository? ? @options.repository : 'TODO Put the git repository path here' %>
-  user: <%= @options.user? ? @options.user : 'TODO Put here the user to logon to the deployment server' %>
-  password: <%= @options.password? ? @options.password : 'TODO Put here the password for the user on the deployment server' %>
+  user: <%= @options.user? ? @options.user : 'TODO Put here the user to logon to the deployment server' %><%= @options.password? ? "\n  password: #{@options.password}" : '' %><%= @options.keyfile? ? "\n  keyfile: #{@options.keyfile}" : '' %><%= @options.private_key? ? "\n  private_key: #{@options.private_key}" : '' %>
   path: <%= @options.path? ? @options.path : 'TODO Put here the path to deploy to on the deployment server' %>
   port: <%= @options.port %>
 production:

@@ -5,6 +5,7 @@ require 'active_support/inflector'
 require 'active_support/core_ext/object'
 require 'active_support/core_ext/hash'
 require 'colorize'
+require 'foreplay/utility'
 
 module Foreplay
   class Deploy < Thor::Group
@@ -48,14 +49,14 @@ module Foreplay
         :port        => 50000
       }
 
-      defaults = deep_merge_with_arrays(defaults, config_all[DEFAULTS_KEY])  if config_all.has_key? DEFAULTS_KEY  # Then the global defaults
-      defaults = deep_merge_with_arrays(defaults, config_env[DEFAULTS_KEY])  if config_env.has_key? DEFAULTS_KEY  # Then the defaults for this environment
+      defaults = Foreplay::Utility::supermerge(defaults, config_all[DEFAULTS_KEY])  if config_all.has_key? DEFAULTS_KEY  # Then the global defaults
+      defaults = Foreplay::Utility::supermerge(defaults, config_env[DEFAULTS_KEY])  if config_env.has_key? DEFAULTS_KEY  # Then the defaults for this environment
 
       config_env.each do |role, additional_instructions|
         next if role == DEFAULTS_KEY # 'defaults' is not a role
         next if filters.has_key?('role') && filters['role'] != role # Only deploy to the role we've specified (or all roles if none is specified)
 
-        instructions        = deep_merge_with_arrays(defaults, additional_instructions).symbolize_keys
+        instructions        = Foreplay::Utility::supermerge(defaults, additional_instructions).symbolize_keys
         instructions[:role] = role
         required_keys       = [:name, :environment, :role, :servers, :path, :repository]
         required_keys.each { |key| terminate("Required key #{key} not found in instructions for #{environment} environment.\nCheck #{config_file}") unless instructions.has_key? key }
@@ -96,8 +97,10 @@ module Foreplay
       # Find out which port we're currently running on
       steps = [ { :command => 'mkdir -p .foreplay && touch .foreplay/current_port && cat .foreplay/current_port', :silent => true } ]
 
-      current_port = execute_on_server(steps, instructions).strip!
-      puts current_port.blank? ? '    No instance is currently deployed' : "    Current instance is using port #{current_port}"
+      current_port_string = execute_on_server(steps, instructions).strip!
+      puts current_port_string.blank? ? '    No instance is currently deployed' : "    Current instance is using port #{current_port_string}"
+
+      current_port = current_port_string.to_i
 
       # Switch ports
       if current_port == port
@@ -177,7 +180,7 @@ module Foreplay
       user        = instructions[:user]
       password    = instructions[:password]
       keyfile     = instructions[:keyfile]
-      key         = instructions[:key]
+      private_key = instructions[:private_key]
 
       keyfile.sub! '~', ENV['HOME'] || '/' unless keyfile.blank? # Remote shell won't expand this for us
 
@@ -186,16 +189,16 @@ module Foreplay
 
       if password.blank?
         # If there's no password we must supply a private key
-        if key.blank?
-          terminate("No authentication methods supplied. You must supply a private key, key file or password in the configuration file") if keyfile.blank?
+        if private_key.blank?
+          terminate('No authentication methods supplied. You must supply a private key, key file or password in the configuration file') if keyfile.blank?
           # Get the key from the key file
           puts "    Using private key from #{keyfile}"
-          key = File.read keyfile
+          private_key = File.read keyfile
         else
           puts "    Using private key from the configuration file"
         end
 
-        options[:key_data] = [key]
+        options[:key_data] = [private_key]
       else
         # Use the password supplied
         options[:password] = password
@@ -209,10 +212,10 @@ module Foreplay
 
         # SSH connection
         begin
-          Net::SSH.start(server, user, options) do |ssh|
+          Net::SSH.start(server, user, options) do |session|
             puts "    Successfully connected to #{server}"
 
-            ssh.shell do |sh|
+            session.shell do |sh|
               steps.each do |step|
                 # Output from this step
                 output    = ''
@@ -259,8 +262,6 @@ module Foreplay
 
       # Each step can be (1) a command or (2) a series of values to add to a file
       if step.has_key? :key
-        step[:silent] = true
-
         # Add values from the config file to a file on the remote machine
         key       = step[:key]
         prefix    = step[:prefix]     || ''
@@ -270,38 +271,27 @@ module Foreplay
         delimiter = step[:delimiter]  || ''
         after     = step[:after]      || ''
 
-        filename  = '%s%s%s%s' % [path, prefix, key, suffix]
-        commands  = step.has_key?(:header) ? ['echo "%s" >> %s' % [step[:header], filename]] : []
+        step[:silent] = true
+        filename      = '%s%s%s%s' % [path, prefix, key, suffix]
 
-        instructions[key].each { |k, v| commands << 'echo "%s%s%s%s%s" >> %s' % [before, k, delimiter, v, after, filename] }
+        if step.has_key?(:header)
+          commands  = ['echo "%s" > %s' % [step[:header], filename]]
+          redirect  = '>>'
+        else
+          commands  = []
+          redirect  = '>'
+        end
+
+        instructions[key].each do |k, v|
+          commands << 'echo "%s%s%s%s%s" %s %s' % [before, k, delimiter, v, after, redirect, filename]
+          redirect = '>>'
+        end
+
+        commands
       else
         # ...or just execute the command specified
-        commands = [step[:command]]
+        [step[:command]]
       end
-    end
-
-    # Returns a new hash with +hash+ and +other_hash+ merged recursively, including arrays.
-    #
-    #   h1 = { x: { y: [4,5,6] }, z: [7,8,9] }
-    #   h2 = { x: { y: [7,8,9] }, z: 'xyz' }
-    #   h1.deep_merge_with_arrays(h2)
-    #   #=> {:x=>{:y=>[4, 5, 6, 7, 8, 9]}, :z=>[7, 8, 9, "xyz"]}
-    def deep_merge_with_arrays(hash, other_hash)
-      new_hash = hash.deep_dup.with_indifferent_access
-
-      other_hash.each_pair do |k,v|
-        tv = new_hash[k]
-
-        if tv.is_a?(Hash) && v.is_a?(Hash)
-          new_hash[k] = deep_merge_with_arrays(tv, v)
-        elsif tv.is_a?(Array) || v.is_a?(Array)
-          new_hash[k] = Array.wrap(tv) + Array.wrap(v)
-        else
-          new_hash[k] = v
-        end
-      end
-
-      new_hash
     end
 
     def explanatory_text(hsh, key)
@@ -309,7 +299,7 @@ module Foreplay
     end
 
     def terminate(message)
-      abort message.red
+      raise message
     end
   end
 end

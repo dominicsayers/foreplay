@@ -8,6 +8,8 @@ module Foreplay
     class_option :repository,   :aliases => '-r'
     class_option :user,         :aliases => '-u'
     class_option :password
+    class_option :keyfile
+    class_option :private_key,  :aliases => '-k'
     class_option :port,         :aliases => '-p', :default => 50000
     class_option :path,         :aliases => '-f'
     class_option :servers,      :aliases => '-s', :type => :array

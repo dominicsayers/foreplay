@@ -27,6 +27,8 @@ module Foreplay
     method_option :repository,  :aliases => '-r'
     method_option :user,        :aliases => '-u'
     method_option :password
+    method_option :keyfile
+    method_option :private_key, :aliases => '-k'
     method_option :path,        :aliases => '-f'
     method_option :port,        :aliases => '-p', :type => :numeric
     method_option :servers,     :aliases => '-s', :type => :array

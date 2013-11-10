@@ -1,6 +1,7 @@
 require 'thor/group'
 require 'yaml'
 require 'net/ssh'
+require 'net/ssh/shell'
 require 'active_support/inflector'
 require 'active_support/core_ext/object'
 require 'active_support/core_ext/hash'
@@ -122,13 +123,15 @@ module Foreplay
       # Commands to execute on remote server
       steps = [
         { :command      => "echo #{current_port} > .foreplay/current_port",
-          :commentary   => "Setting the port for the new instance to #{current_port}" },
+          :commentary   => "Setting the port for the new instance to #{current_port}\n" },
         { :command      => "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} && git clone #{repository} #{current_port}",
           :commentary   => "Cloning repository #{repository}" },
         { :command      => "rvm rvmrc trust #{current_port}",
           :commentary   => 'Trusting the .rvmrc file for the new instance' },
         { :command      => "cd #{current_port}",
           :commentary   => 'Configuring the new instance' },
+        { :command      => 'mkdir -p config',
+          :commentary   => "Making sure the config directory exists\n" },
         { :key          => :env,
           :delimiter    => '=',
           :prefix       => '.',
@@ -144,11 +147,11 @@ module Foreplay
           :before       => '  ',
           :header       => "#{environment}:",
           :path         => 'config/' },
-        { :command      => "bundle install",
+        { :command      => 'bundle install',
           :commentary   => 'Using bundler to install the required gems' },
-        { :command      => "sudo ln -f `which foreman` /usr/bin/foreman",
+        { :command      => 'sudo ln -f `which foreman` /usr/bin/foreman',
           :commentary   => 'Setting the current version of foreman to be the default' },
-        { :command      => "sudo foreman export upstart /etc/init",
+        { :command      => 'sudo foreman export upstart /etc/init',
           :commentary   => "Converting #{current_service} to an upstart service" },
         { :command      => "sudo start #{current_service} || sudo restart #{current_service}",
           :commentary   => 'Starting the service',
@@ -160,13 +163,13 @@ module Foreplay
         { :command      => "sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port #{former_port.to_i + 100}",
           :commentary   => "Removing previous firewall directing traffic to port #{former_port}",
           :ignore_error => true },
-        { :command      => "sudo iptables-save > /etc/iptables/rules.v4",
-          :commentary   => "Saving iptables rules to /etc/iptables/rules.v4" },
-        { :command      => "sudo iptables-save > /etc/iptables.up.rules",
-          :commentary   => "Saving iptables rules to /etc/iptables.up.rules" },
-        { :command      => "sudo iptables-save -c | egrep REDIRECT --color=never",
+        { :command      => 'sudo iptables-save > /etc/iptables/rules.v4',
+          :commentary   => 'Saving iptables rules to /etc/iptables/rules.v4' },
+        { :command      => 'sudo iptables-save > /etc/iptables.up.rules',
+          :commentary   => 'Saving iptables rules to /etc/iptables.up.rules' },
+        { :command      => 'sudo iptables-save -c | egrep REDIRECT --color=never',
           :ignore_error => true,
-          :commentary   => "Current firewall NAT configuration:" },
+          :commentary   => 'Current firewall NAT configuration:' },
         { :command      => "sudo stop #{former_service} || echo 'No previous instance running'",
           :commentary   => 'Stopping the previous instance',
           :ignore_error => true },

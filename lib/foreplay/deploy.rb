@@ -75,7 +75,7 @@ module Foreplay
       servers     = instructions[:servers]
       preposition = mode == :deploy ? 'to' : 'for'
 
-      puts "#{mode.capitalize}ing #{instructions[:name].yellow} #{preposition} #{servers.join(', ').yellow} in the #{instructions[:role].dup.yellow} role on the #{environment.dup.yellow} environment..." if servers.length > 1
+      puts "#{mode.capitalize}ing #{instructions[:name].yellow} #{preposition} #{servers.join(', ').yellow} for the #{instructions[:role].dup.yellow} role in the #{environment.dup.yellow} environment..." if servers.length > 1
       servers.each { |server| deploy_to_server server, instructions }
     end
 
@@ -90,7 +90,7 @@ module Foreplay
 
       instructions[:server] = server
 
-      puts "#{mode.capitalize}ing #{name.yellow} #{preposition} #{server.yellow} in the #{role.dup.yellow} role on the #{environment.dup.yellow} environment"
+      puts "#{mode.capitalize}ing #{name.yellow} #{preposition} #{server.yellow} for the #{role.dup.yellow} role in the #{environment.dup.yellow} environment"
 
       # Substitute variables in the path
       path.gsub! '%u', user
@@ -165,9 +165,11 @@ module Foreplay
           :commentary   => "Removing previous firewall directing traffic to port #{former_port}",
           :ignore_error => true },
         { :command      => 'sudo iptables-save > /etc/iptables/rules.v4',
-          :commentary   => 'Saving iptables rules to /etc/iptables/rules.v4' },
+          :commentary   => 'Attempting to save iptables rules to /etc/iptables/rules.v4',
+          :ignore_error => true },
         { :command      => 'sudo iptables-save > /etc/iptables.up.rules',
-          :commentary   => 'Saving iptables rules to /etc/iptables.up.rules' },
+          :commentary   => 'Attempting to save iptables rules to /etc/iptables.up.rules',
+          :ignore_error => true },
         { :command      => 'sudo iptables-save -c | egrep REDIRECT --color=never',
           :ignore_error => true,
           :commentary   => 'Current firewall NAT configuration:' },

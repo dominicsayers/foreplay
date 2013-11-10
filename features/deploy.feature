@@ -91,6 +91,6 @@ Feature: deploy
   Scenario: deploy
     When I run `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com --password "top-secret"`
       And I run `foreplay deploy production`
-    Then the output should contain "Deploying aruba to web.example.com in the web role on the production environment"
+    Then the output should contain "Deploying aruba to web.example.com for the web role in the production environment"
       And the output should contain "Connecting to web.example.com"
       And the output should contain "There was a problem starting an ssh session on web.example.com"

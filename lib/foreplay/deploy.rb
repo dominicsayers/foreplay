@@ -16,7 +16,8 @@ module Foreplay
     argument :environment,  :type => :string, :required => true
     argument :filters,      :type => :hash,   :required => false
 
-    DEFAULTS_KEY = 'defaults'
+    DEFAULTS_KEY  = 'defaults'
+    INDENT        = ' ' * 4
 
     def parse
       # Explain what we're going to do
@@ -99,7 +100,7 @@ module Foreplay
       steps = [ { :command => 'mkdir -p .foreplay && touch .foreplay/current_port && cat .foreplay/current_port', :silent => true } ]
 
       current_port_string = execute_on_server(steps, instructions).strip!
-      puts current_port_string.blank? ? '    No instance is currently deployed' : "    Current instance is using port #{current_port_string}"
+      puts current_port_string.blank? ? "#{INDENT}No instance is currently deployed" : "#{INDENT}Current instance is using port #{current_port_string}"
 
       current_port = current_port_string.to_i
 
@@ -123,7 +124,7 @@ module Foreplay
       # Commands to execute on remote server
       steps = [
         { :command      => "echo #{current_port} > .foreplay/current_port",
-          :commentary   => "Setting the port for the new instance to #{current_port}\n" },
+          :commentary   => "Setting the port for the new instance to #{current_port}" },
         { :command      => "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} && git clone #{repository} #{current_port}",
           :commentary   => "Cloning repository #{repository}" },
         { :command      => "rvm rvmrc trust #{current_port}",
@@ -131,7 +132,7 @@ module Foreplay
         { :command      => "cd #{current_port}",
           :commentary   => 'Configuring the new instance' },
         { :command      => 'mkdir -p config',
-          :commentary   => "Making sure the config directory exists\n" },
+          :commentary   => "Making sure the config directory exists" },
         { :key          => :env,
           :delimiter    => '=',
           :prefix       => '.',
@@ -158,9 +159,9 @@ module Foreplay
           :ignore_error => true },
         { :command      => 'sleep 60',
           :commentary   => 'Waiting 60s to give service time to start' },
-        { :command      => "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port #{current_port.to_i + 100}",
+        { :command      => "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port #{current_port}",
           :commentary   => "Adding firewall rule to direct incoming traffic on port 80 to port #{current_port}" },
-        { :command      => "sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port #{former_port.to_i + 100}",
+        { :command      => "sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port #{former_port}",
           :commentary   => "Removing previous firewall directing traffic to port #{former_port}",
           :ignore_error => true },
         { :command      => 'sudo iptables-save > /etc/iptables/rules.v4',
@@ -195,10 +196,10 @@ module Foreplay
         if private_key.blank?
           terminate('No authentication methods supplied. You must supply a private key, key file or password in the configuration file') if keyfile.blank?
           # Get the key from the key file
-          puts "    Using private key from #{keyfile}"
+          puts "#{INDENT}Using private key from #{keyfile}"
           private_key = File.read keyfile
         else
-          puts "    Using private key from the configuration file"
+          puts "#{INDENT}Using private key from the configuration file"
         end
 
         options[:key_data] = [private_key]
@@ -211,12 +212,12 @@ module Foreplay
       output = ''
 
       if mode == :deploy
-        puts "    Connecting to #{server}"
+        puts "#{INDENT}Connecting to #{server}"
 
         # SSH connection
         begin
           Net::SSH.start(server, user, options) do |session|
-            puts "    Successfully connected to #{server}"
+            puts "#{INDENT}Successfully connected to #{server}"
 
             session.shell do |sh|
               steps.each do |step|
@@ -237,7 +238,7 @@ module Foreplay
                   sh.wait!
 
                   if step[:ignore_error] == true || process.exit_status == 0
-                    print output.gsub!(/^/, "        ") unless step[:silent] == true
+                    print output.gsub!(/^/, INDENT * 2) unless step[:silent] == true || output.blank?
                   else
                     terminate(output)
                   end
@@ -253,7 +254,7 @@ module Foreplay
         steps.each do |step|
           commands = build_commands step, instructions
 
-          commands.each { |command| puts "        #{command}" unless step[:silent] }
+          commands.each { |command| puts "#{INDENT * 2}#{command}" unless step[:silent] }
         end
       end
 
@@ -261,7 +262,7 @@ module Foreplay
     end
 
     def build_commands step, instructions
-      puts "    #{(step[:commentary] || step[:command]).yellow}" unless step[:silent] == true
+      puts "#{INDENT}#{(step[:commentary] || step[:command]).yellow}" unless step[:silent] == true
 
       # Each step can be (1) a command or (2) a series of values to add to a file
       if step.has_key? :key

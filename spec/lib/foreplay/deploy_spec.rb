@@ -84,7 +84,7 @@ describe Foreplay::Deploy do
       'echo "  username: TODO Put here the database user" >> config/database.yml',
       'echo "  password: TODO Put here the database user\'s password" >> config/database.yml',
       'bundle install --deployment --without development test',
-      'sudo ln -f `which foreman` /usr/bin/foreman',
+      'sudo ln -f `which foreman` /usr/bin/foreman || echo Using default version of foreman',
       'sudo foreman export upstart /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',
       'sleep 60',

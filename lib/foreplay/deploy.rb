@@ -154,7 +154,7 @@ module Foreplay
           :path         => 'config/' },
         { :command      => 'bundle install --deployment --without development test',
           :commentary   => 'Using bundler to install the required gems in deployment mode' },
-        { :command      => 'sudo ln -f `which foreman` /usr/bin/foreman',
+        { :command      => 'sudo ln -f `which foreman` /usr/bin/foreman || echo Using default version of foreman',
           :commentary   => 'Setting the current version of foreman to be the default' },
         { :command      => 'sudo foreman export upstart /etc/init',
           :commentary   => "Converting #{current_service} to an upstart service" },

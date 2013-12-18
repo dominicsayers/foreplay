@@ -14,6 +14,7 @@ Feature: Setup
 		  name: aruba
 		  repository: TODO Put the git repository path here
 		  user: TODO Put here the user to logon to the deployment server
+		  password: TODO Supply a password or private key to connect to the server
 		  path: TODO Put here the path to deploy to on the deployment server
 		  port: 50000
 		production:

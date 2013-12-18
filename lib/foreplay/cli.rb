@@ -39,6 +39,7 @@ module Foreplay
     method_option :db_host,     :aliases => '-h'
     method_option :db_user
     method_option :db_password
+    method_option :resque_redis
 
     def setup
       Foreplay::Setup.start

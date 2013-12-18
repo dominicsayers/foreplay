@@ -20,6 +20,7 @@ module Foreplay
     class_option :db_host,      :aliases => '-h'
     class_option :db_user
     class_option :db_password
+    class_option :resque_redis
 
     def self.source_root
       File.dirname(__FILE__)

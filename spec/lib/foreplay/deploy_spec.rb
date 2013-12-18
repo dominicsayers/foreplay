@@ -70,6 +70,7 @@ describe Foreplay::Deploy do
       'rvm rvmrc warning ignore 50000',
       'cd 50000',
       'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
+      'mkdir -p config',
       'echo "RAILS_ENV=production" > .env',
       'echo "concurrency: web=1,worker=0,scheduler=0" > .foreman',
       'echo "app: foreplay-50000" >> .foreman',
@@ -110,6 +111,12 @@ describe Foreplay::Deploy do
   it "should use the private key provided in the config file" do
     `rm -f config/foreplay.yml`
     `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred -k "top secret private key"`
+    Foreplay::Deploy.start([:deploy, 'production', ''])
+  end
+
+  it "should add Redis details for Resque" do
+    `rm -f config/foreplay.yml`
+    `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --resque-redis "redis://localhost:6379"`
     Foreplay::Deploy.start([:deploy, 'production', ''])
   end
 end

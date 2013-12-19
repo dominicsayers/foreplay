@@ -152,6 +152,12 @@ module Foreplay
           :before       => '  ',
           :header       => "#{environment}:",
           :path         => 'config/' },
+        { :key          => :resque,
+          :delimiter    => ': ',
+          :suffix       => '.yml',
+          :commentary   => 'Building config/resque.yml',
+          :before       => environment,
+          :path         => 'config/' },
         { :command      => 'bundle install --deployment --without development test',
           :commentary   => 'Using bundler to install the required gems in deployment mode' },
         { :command      => 'sudo ln -f `which foreman` /usr/bin/foreman || echo Using default version of foreman',
@@ -230,8 +236,7 @@ module Foreplay
                 # Output from this step
                 output    = ''
                 previous  = '' # We don't need or want the final CRLF
-
-                commands = build_commands step, instructions
+                commands  = build_step step, instructions
 
                 commands.each do |command|
                   process = sh.execute command
@@ -258,7 +263,7 @@ module Foreplay
       else
         # Deployment check: just say what we would have done
         steps.each do |step|
-          commands = build_commands step, instructions
+          commands = build_step step, instructions
 
           commands.each { |command| puts "#{INDENT * 2}#{command}" unless step[:silent] }
         end
@@ -267,41 +272,54 @@ module Foreplay
       output
     end
 
-    def build_commands step, instructions
+    def build_step step, instructions
       puts "#{INDENT}#{(step[:commentary] || step[:command]).yellow}" unless step[:silent] == true
 
       # Each step can be (1) a command or (2) a series of values to add to a file
-      if step.has_key? :key
-        # Add values from the config file to a file on the remote machine
-        key       = step[:key]
-        prefix    = step[:prefix]     || ''
-        suffix    = step[:suffix]     || ''
-        path      = step[:path]       || ''
-        before    = step[:before]     || ''
-        delimiter = step[:delimiter]  || ''
-        after     = step[:after]      || ''
-
-        step[:silent] = true
-        filename      = '%s%s%s%s' % [path, prefix, key, suffix]
-
-        if step.has_key?(:header)
-          commands  = ['echo "%s" > %s' % [step[:header], filename]]
-          redirect  = '>>'
+      if step.has_key?(:key)
+        if instructions.has_key?(step[:key])
+          build_commands step, instructions
         else
-          commands  = []
-          redirect  = '>'
+          []
         end
-
-        instructions[key].each do |k, v|
-          commands << 'echo "%s%s%s%s%s" %s %s' % [before, k, delimiter, v, after, redirect, filename]
-          redirect = '>>'
-        end
-
-        commands
       else
         # ...or just execute the command specified
         [step[:command]]
       end
+    end
+
+    def build_commands step, instructions
+      # Add values from the config file to a file on the remote machine
+      key       = step[:key]
+      prefix    = step[:prefix]     || ''
+      suffix    = step[:suffix]     || ''
+      path      = step[:path]       || ''
+      before    = step[:before]     || ''
+      delimiter = step[:delimiter]  || ''
+      after     = step[:after]      || ''
+
+      step[:silent] = true
+      filename      = '%s%s%s%s' % [path, prefix, key, suffix]
+
+      if step.has_key?(:header)
+        commands  = ['echo "%s" > %s' % [step[:header], filename]]
+        redirect  = '>>'
+      else
+        commands  = []
+        redirect  = '>'
+      end
+
+      if instructions[key].kind_of?(Hash)
+        instructions[key].each do |k, v|
+          commands << 'echo "%s%s%s%s%s" %s %s' % [before, k, delimiter, v, after, redirect, filename]
+          redirect = '>>'
+        end
+      else
+        commands << 'echo "%s%s%s%s" %s %s' % [before, delimiter, instructions[key], after, redirect, filename]
+        redirect = '>>'
+      end
+
+      commands
     end
 
     def explanatory_text(hsh, key)

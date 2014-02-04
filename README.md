@@ -1,3 +1,5 @@
+https://www.codeship.io/projects/4c66fa50-6fe8-0131-cd4a-029a713ec00a/status
+
 # Foreplay
 
 Foreplay: deploying Rails projects to Ubuntu using Foreman

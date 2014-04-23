@@ -1,5 +1,10 @@
 # Foreplay
 
+[![Gem Version](https://badge.fury.io/rb/foreplay.png)](http://badge.fury.io/rb/foreplay)
+[![Code Climate](https://codeclimate.com/github/Xenapto/foreplay.png)](https://codeclimate.com/github/Xenapto/foreplay)
+[![Dependency Status](https://gemnasium.com/Xenapto/foreplay.png)](https://gemnasium.com/Xenapto/foreplay)
+![build status](https://circleci.com/gh/Xenapto/foreplay.png?circle-token=dd3a51864d33f6506b18a355bc901b90c0df3b3b)
+
 Foreplay: deploying Rails projects to Ubuntu using Foreman
 
 ## Installation

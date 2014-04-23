@@ -39,8 +39,8 @@ Feature: Setup
 		| config/foreplay.yml |
 	And the output should contain:
 		"""
-		ERROR: foreplay setup was called with arguments ["-x", "abc"]
-		Usage: "foreplay setup".
+		ERROR: "foreplay setup" was called with arguments ["-x", "abc"]
+		Usage: "foreplay setup"
 		"""
 
   Scenario: Setup invalid option
@@ -49,8 +49,8 @@ Feature: Setup
 		| config/foreplay.yml |
 	And the output should contain:
 		"""
-		ERROR: foreplay setup was called with arguments ["--xyz", "abc"]
-		Usage: "foreplay setup".
+		ERROR: "foreplay setup" was called with arguments ["--xyz", "abc"]
+		Usage: "foreplay setup"
 		"""
 
   Scenario: Setup invalid pool option type

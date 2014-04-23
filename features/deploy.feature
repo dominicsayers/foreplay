@@ -7,24 +7,24 @@ Feature: deploy
     When I run `foreplay deploy`
     Then the output should contain:
         """
-        ERROR: foreplay deploy was called with no arguments
-        Usage: "foreplay deploy ENVIRONMENT".
+        ERROR: "foreplay deploy" was called with no arguments
+        Usage: "foreplay deploy ENVIRONMENT"
         """
 
   Scenario: invalid parameter
     When I run `foreplay deploy test --invalid xyz`
     Then the output should contain:
     	"""
-    	ERROR: foreplay deploy was called with arguments ["test", "--invalid", "xyz"]
-		  Usage: "foreplay deploy ENVIRONMENT".
+    	ERROR: "foreplay deploy" was called with arguments ["test", "--invalid", "xyz"]
+		  Usage: "foreplay deploy ENVIRONMENT"
     	"""
 
   Scenario: short invalid parameter
     When I run `foreplay deploy test -x xyz`
     Then the output should contain:
       """
-		  ERROR: foreplay deploy was called with arguments ["test", "-x", "xyz"]
-		  Usage: "foreplay deploy ENVIRONMENT".
+		  ERROR: "foreplay deploy" was called with arguments ["test", "-x", "xyz"]
+		  Usage: "foreplay deploy ENVIRONMENT"
     	"""
 
   Scenario: no config file

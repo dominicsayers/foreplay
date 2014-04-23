@@ -41,7 +41,7 @@ describe Foreplay::Deploy do
   it "should complain if the private keyfile defined in the config file doesn't exist" do
     `rm -f config/foreplay.yml`
     `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --keyfile "/home/fred/no-such-file"`
-    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }.to raise_error(Errno::ENOENT, /.*No such file or directory - \/home\/fred\/no-such-file*/)
+    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }.to raise_error(Errno::ENOENT, /.*No such file or directory @ rb_sysopen - \/home\/fred\/no-such-file*/)
   end
 
   it "should terminate if a remote process exits with a non-zero status" do

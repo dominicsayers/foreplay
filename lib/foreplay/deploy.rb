@@ -162,6 +162,8 @@ module Foreplay
           :commentary   => 'Using bundler to install the required gems in deployment mode' },
         { :command      => 'sudo ln -f `which foreman` /usr/bin/foreman || echo Using default version of foreman',
           :commentary   => 'Setting the current version of foreman to be the default' },
+        { :command      => 'echo PATH="$PATH:`which bundle`" >> .env',
+          :commentary   => 'Adding bundler path to .env (foreplay issue #443)' },
         { :command      => 'sudo foreman export upstart /etc/init',
           :commentary   => "Converting #{current_service} to an upstart service" },
         { :command      => "sudo start #{current_service} || sudo restart #{current_service}",

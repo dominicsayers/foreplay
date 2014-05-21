@@ -6,25 +6,22 @@ Feature: check
   Scenario: Check configuration
     When I run `foreplay check`
     Then the output should contain:
-        """
-        ERROR: "foreplay check" was called with no arguments
-        Usage: "foreplay check ENVIRONMENT"
-        """
+      """
+      foreplay check requires at least 1 argument: "foreplay check ENVIRONMENT".
+      """
 
   Scenario: Check configuration parameters - invalid parameter
     When I run `foreplay check test --invalid xyz`
     Then the output should contain:
-    	"""
-    	ERROR: "foreplay check" was called with arguments ["test", "--invalid", "xyz"]
-		  Usage: "foreplay check ENVIRONMENT"
+     	"""
+      foreplay check requires at least 1 argument: "foreplay check ENVIRONMENT".
     	"""
 
   Scenario: Check configuration parameters - short invalid parameter
     When I run `foreplay check test -x xyz`
     Then the output should contain:
       """
-		  ERROR: "foreplay check" was called with arguments ["test", "-x", "xyz"]
-		  Usage: "foreplay check ENVIRONMENT"
+      foreplay check requires at least 1 argument: "foreplay check ENVIRONMENT".
     	"""
 
   Scenario: Check configuration parameters - no config file

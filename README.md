@@ -9,7 +9,11 @@ Foreplay: deploying Rails projects to Ubuntu using Foreman
 
 I noticed with surprise on [RubyGems](https://rubygems.org/gems/foreplay) that my little gem had been downloaded a few times, so clearly people are trying to use it. Thanks for trying it, people. I apologise for the poor state of the documentation below: it's out of date and misleading.
 
-There's now a CLI for the gem so you can use it like this:
+There's now a CLI for the gem so you can use it as follows. To check what it's going to do:
+
+    foreplay check production
+    
+...and if you're brave enough to try it for real:
 
     foreplay deploy production
     

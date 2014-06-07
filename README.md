@@ -91,14 +91,14 @@ production:
 A quick walk-though of this configuration:
 
 1.  I'm deploying the `master` branch of the Github project `git@github.com:Xenapto/xendata.git`
-1.  I'm making an SSH connection to my production servers with the username `xenapto` and the keyfile in `~/.ssh/id_circleci_github` on the machine I'm deploying from
+1.  I'm making an SSH connection to my production servers with the username `xenapto` and the keyfile in `~/.ssh/id_circleci_github` which lives on the machine I'm deploying from
 2.  I'm deploying to the directory `~/apps/xendata` (`%a` is expanded to the name of the app)
-3.  In this file I'm defining the `production` environment. I could also define a `staging` section if I wanted to.
+3.  In this config file I'm defining the `production` environment. I could also define a `staging` section if I wanted to.
 3.  On each server I'm creating a `database.yml` file with the contents of the `database` section of this config
 4.  I'm creating a `resque.yml` file from the contents of the `resque` section
-5.  I'm deplying three different types of server. The roles are `web`, `auxiliary` and `largeserver`. These names are completely arbitrary. I can deploy all or one of these roles.
+5.  I'm deploying three different types of server. The roles are `web`, `auxiliary` and `largeserver`. These names are completely arbitrary. I can deploy all or one of these roles.
 6.  Each role contains a list of servers and any overrides to the default settings
-7.  For instance the `web` role is deployed to `sandham.xenapto.net`. The database is on the same machine (`localhost`). The Foreman `concurrency` setting defines which workers from my Procfile are launched on that server.
+7.  For instance the `web` role is deployed to `sandham.xenapto.net`. For that server the database is on the same machine (`localhost`). The Foreman `concurrency` setting defines which workers from my Procfile are launched on that server.
 8.  Note that in the `auxiliary` role I am deploying to two servers. On the second (`edrich.xenapto.net`) I'm using port 10022 for SSH instead of the default.
 
 General format:

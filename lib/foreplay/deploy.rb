@@ -199,7 +199,7 @@ module Foreplay
     end
 
     def execute_on_server steps, instructions
-      server      = instructions[:server]
+      server_port = instructions[:server]
       user        = instructions[:user]
       password    = instructions[:password]
       keyfile     = instructions[:keyfile]
@@ -207,8 +207,12 @@ module Foreplay
 
       keyfile.sub! '~', ENV['HOME'] || '/' unless keyfile.blank? # Remote shell won't expand this for us
 
+      # Parse server + port
+      server, port = server_port.split(':')
+      port ||= 22
+
       # SSH authentication methods
-      options = { :verbose => :warn }
+      options = { :verbose => :warn, :port => port }
 
       if password.blank?
         # If there's no password we must supply a private key
@@ -231,12 +235,12 @@ module Foreplay
       output = ''
 
       if mode == :deploy
-        puts "#{INDENT}Connecting to #{server}"
+        puts "#{INDENT}Connecting to #{server} on port #{port}"
 
         # SSH connection
         begin
           Net::SSH.start(server, user, options) do |session|
-            puts "#{INDENT}Successfully connected to #{server}"
+            puts "#{INDENT}Successfully connected to #{server} on port #{port}"
 
             session.shell do |sh|
               steps.each do |step|
@@ -265,7 +269,7 @@ module Foreplay
             end
           end
         rescue SocketError => e
-          terminate "There was a problem starting an ssh session on #{server}:\n#{e.message}"
+          terminate "There was a problem starting an ssh session on #{server_port}:\n#{e.message}"
         end
       else
         # Deployment check: just say what we would have done

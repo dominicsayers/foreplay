@@ -60,7 +60,7 @@ describe Foreplay::Deploy do
   end
 
   it "should deploy to the environment" do
-    Net::SSH.should_receive(:start).with('web.example.com', 'fred', { :verbose => :warn, :password => 'trollope' }).and_yield(session)
+    Net::SSH.should_receive(:start).with('web.example.com', 'fred', { :verbose => :warn, :port => 22, :password => 'trollope' }).and_yield(session)
 
     [
       'mkdir -p .foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',

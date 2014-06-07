@@ -63,8 +63,8 @@ describe Foreplay::Deploy do
     Net::SSH.should_receive(:start).with('web.example.com', 'fred', { :verbose => :warn, :password => 'trollope' }).and_yield(session)
 
     [
-      'mkdir -p .foreplay && touch .foreplay/current_port && cat .foreplay/current_port',
-      'echo 50000 > .foreplay/current_port',
+      'mkdir -p .foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
+      'echo 50000 > .foreplay/foreplay/current_port',
       'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone git@github.com:Xenapto/foreplay.git 50000',
       'rvm rvmrc trust 50000',
       'rvm rvmrc warning ignore 50000',
@@ -104,7 +104,7 @@ describe Foreplay::Deploy do
 
   it "should use another port if there's already an installed instance" do
     process.stub(:on_output).and_yield(process, "50000\n")
-    shell.should_receive(:execute).with('echo 51000 > .foreplay/current_port').and_return(process)
+    shell.should_receive(:execute).with('echo 51000 > .foreplay/foreplay/current_port').and_return(process)
     Foreplay::Deploy.start [:deploy, 'production', '']
   end
 

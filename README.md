@@ -12,15 +12,12 @@ I noticed with surprise on [RubyGems](https://rubygems.org/gems/foreplay) that m
 There's now a CLI for the gem so you can use it as follows. To check what it's going to do:
 
     foreplay check production
-    
+
 ...and if you're brave enough to try it for real:
 
     foreplay deploy production
-    
+
 ...after you've set it up by creating a `config/foreplay.yml` file.
-
-Don't read any further. It's all rubbish below here :-)
-
 
 ## Installation
 
@@ -35,17 +32,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install foreplay
-
-## Usage
-
-    ENV=production rake foreplay:push
-
-or
-
-    ENV=production ROLE=web rake foreplay:push
-
-You can set the environment variables `ENV` and `ROLE` elsewhere if you wish.
-If `ROLE` is not defined then we deploy all roles.
 
 ### How it works
 

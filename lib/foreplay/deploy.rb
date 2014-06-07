@@ -97,7 +97,8 @@ module Foreplay
       path.gsub! '%a', name
 
       # Find out which port we're currently running on
-      steps = [ { :command => 'mkdir -p .foreplay && touch .foreplay/current_port && cat .foreplay/current_port', :silent => true } ]
+      current_port_file = ".foreplay/#{name}/current_port"
+      steps = [ { :command => "mkdir -p .foreplay && touch #{current_port_file} && cat #{current_port_file}", :silent => true } ]
 
       current_port_string = execute_on_server(steps, instructions).strip!
       puts current_port_string.blank? ? "#{INDENT}No instance is currently deployed" : "#{INDENT}Current instance is using port #{current_port_string}"
@@ -123,7 +124,7 @@ module Foreplay
 
       # Commands to execute on remote server
       steps = [
-        { :command      => "echo #{current_port} > .foreplay/current_port",
+        { :command      => "echo #{current_port} > #{current_port_file}",
           :commentary   => "Setting the port for the new instance to #{current_port}" },
         { :command      => "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} && git clone #{repository} #{current_port}",
           :commentary   => "Cloning repository #{repository}" },

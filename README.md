@@ -50,7 +50,59 @@ There should be little or no downtime. If the app is b0rked then you can easily 
 
 ### foreplay.yml
 
-Format:
+Here's my actual foreplay.yml that I use to deploy my app Xendata:
+
+```YAML
+---
+defaults:
+  repository: git@github.com:Xenapto/xendata.git
+  branch: master
+  user: xenapto
+  keyfile: ~/.ssh/id_circleci_github
+  path: apps/%a
+production:
+  defaults:
+    database:
+      adapter: postgresql
+      encoding: utf8
+      database: xendata
+      pool: 10
+      host: sandham.xenapto.net
+      reconnect: true
+      timeout: 5000
+      username: kjh123kj1h23
+      password: ,mn23-1m412-not-really
+    resque: redis://kjjh3425mnb:bn34=-23f2@redis.xenapto.net:6379
+  web:
+    servers: [sandham.xenapto.net]
+    database:
+      host: localhost
+    foreman:
+      concurrency: 'web=1,worker_immediate=2,worker_longjobs=1,scheduler=1,resque_web=1,new_relic_resque=1'
+  auxiliary:
+    servers: [bradman.xenapto.net,edrich.xenapto.net:10022]
+    foreman:
+      concurrency: 'worker_regular=8'
+  largeserver:
+    servers: [simpson.xenapto.net]
+    foreman:
+      concurrency: 'worker_longjobs=1,worker_regular=24'
+```
+
+A quick walk-though of this configuration:
+
+1.  I'm deploying the `master` branch of the Github project `git@github.com:Xenapto/xendata.git`
+1.  I'm making an SSH connection to my production servers with the username `xenapto` and the keyfile in `~/.ssh/id_circleci_github` on the machine I'm deploying from
+2.  I'm deploying to the directory `~/apps/xendata` (`%a` is expanded to the name of the app)
+3.  In this file I'm defining the `production` environment. I could also define a `staging` section if I wanted to.
+3.  On each server I'm creating a `database.yml` file with the contents of the `database` section of this config
+4.  I'm creating a `resque.yml` file from the contents of the `resque` section
+5.  I'm deplying three different types of server. The roles are `web`, `auxiliary` and `largeserver`. These names are completely arbitrary. I can deploy all or one of these roles.
+6.  Each role contains a list of servers and any overrides to the default settings
+7.  For instance the `web` role is deployed to `sandham.xenapto.net`. The database is on the same machine (`localhost`). The Foreman `concurrency` setting defines which workers from my Procfile are launched on that server.
+8.  Note that in the `auxiliary` role I am deploying to two servers. On the second (`edrich.xenapto.net`) I'm using port 10022 for SSH instead of the default.
+
+General format:
 
 ```YAML
 defaults:       # global defaults for all environments

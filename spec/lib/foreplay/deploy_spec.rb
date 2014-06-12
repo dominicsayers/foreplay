@@ -60,11 +60,9 @@ describe Foreplay::Deploy do
   end
 
   it "should deploy to the environment" do
-    Net::SSH.should_receive(:start).with('web.example.com', 'fred', { :verbose => :warn, :password => 'trollope' }).and_yield(session)
+    Net::SSH.should_receive(:start).with('web.example.com', 'fred', { :verbose => :warn, :port => 22, :password => 'trollope' }).and_yield(session)
 
     [
-      'mkdir -p .foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
-      'echo 50000 > .foreplay/foreplay/current_port',
       'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone git@github.com:Xenapto/foreplay.git 50000',
       'rvm rvmrc trust 50000',
       'rvm rvmrc warning ignore 50000',
@@ -88,6 +86,8 @@ describe Foreplay::Deploy do
       'sudo ln -f `which foreman` /usr/bin/foreman || echo Using default version of foreman',
       'sudo foreman export upstart /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',
+      'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
+      'echo 50000 > .foreplay/foreplay/current_port',
       'sleep 60',
       'sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 50000',
       'sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 51000',

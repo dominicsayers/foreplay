@@ -1,6 +1,8 @@
 # Initialize simplecov for coverage report.
 require 'simplecov'
+require 'coveralls'
 SimpleCov.start
+Coveralls.wear!('rails') if ENV['COVERALLS_REPO_TOKEN']
 
 RSpec.configure do |config|
  # Run specs in random order to surface order dependencies. If you find an

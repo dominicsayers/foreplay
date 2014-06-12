@@ -98,7 +98,7 @@ module Foreplay
 
       # Find out which port we're currently running on
       current_port_file = ".foreplay/#{name}/current_port"
-      steps = [ { :command => "mkdir -p .foreplay && touch #{current_port_file} && cat #{current_port_file}", :silent => true } ]
+      steps = [ { :command => "mkdir -p .foreplay/#{name} && touch #{current_port_file} && cat #{current_port_file}", :silent => true } ]
 
       current_port_string = execute_on_server(steps, instructions).strip!
       puts current_port_string.blank? ? "#{INDENT}No instance is currently deployed" : "#{INDENT}Current instance is using port #{current_port_string}"
@@ -124,8 +124,6 @@ module Foreplay
 
       # Commands to execute on remote server
       steps = [
-        { :command      => "echo #{current_port} > #{current_port_file}",
-          :commentary   => "Setting the port for the new instance to #{current_port}" },
         { :command      => "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} && git clone #{repository} #{current_port}",
           :commentary   => "Cloning repository #{repository}" },
         { :command      => "rvm rvmrc trust #{current_port}",
@@ -174,6 +172,8 @@ module Foreplay
         { :command      => "sudo start #{current_service} || sudo restart #{current_service}",
           :commentary   => 'Starting the service',
           :ignore_error => true },
+        { :command      => "echo #{current_port} > #{current_port_file}",
+          :commentary   => "Setting the port for the new instance to #{current_port}" },
         { :command      => 'sleep 60',
           :commentary   => 'Waiting 60s to give service time to start' },
         { :command      => "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port #{current_port}",
@@ -199,7 +199,7 @@ module Foreplay
     end
 
     def execute_on_server steps, instructions
-      server      = instructions[:server]
+      server_port = instructions[:server]
       user        = instructions[:user]
       password    = instructions[:password]
       keyfile     = instructions[:keyfile]
@@ -207,8 +207,12 @@ module Foreplay
 
       keyfile.sub! '~', ENV['HOME'] || '/' unless keyfile.blank? # Remote shell won't expand this for us
 
+      # Parse server + port
+      server, port = server_port.split(':')
+      port ||= 22
+
       # SSH authentication methods
-      options = { :verbose => :warn }
+      options = { :verbose => :warn, :port => port }
 
       if password.blank?
         # If there's no password we must supply a private key
@@ -231,12 +235,12 @@ module Foreplay
       output = ''
 
       if mode == :deploy
-        puts "#{INDENT}Connecting to #{server}"
+        puts "#{INDENT}Connecting to #{server} on port #{port}"
 
         # SSH connection
         begin
           Net::SSH.start(server, user, options) do |session|
-            puts "#{INDENT}Successfully connected to #{server}"
+            puts "#{INDENT}Successfully connected to #{server} on port #{port}"
 
             session.shell do |sh|
               steps.each do |step|
@@ -265,7 +269,7 @@ module Foreplay
             end
           end
         rescue SocketError => e
-          terminate "There was a problem starting an ssh session on #{server}:\n#{e.message}"
+          terminate "There was a problem starting an ssh session on #{server_port}:\n#{e.message}"
         end
       else
         # Deployment check: just say what we would have done

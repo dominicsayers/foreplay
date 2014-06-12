@@ -29,5 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'cucumber', '~> 1.3'
   spec.add_development_dependency 'aruba', '~> 0.5'
   spec.add_development_dependency 'gem-release', '~> 0.7'
-  spec.add_development_dependency 'simplecov', '~> 0.8'
+  spec.add_development_dependency 'simplecov', '~> 0.7', '>= 0.7.1' # https://github.com/colszowka/simplecov/issues/281
+  spec.add_development_dependency 'coveralls', '~> 0'
 end

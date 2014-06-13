@@ -41,6 +41,9 @@ module Foreplay
         terminate("No deployment configuration defined for #{environment} environment.\nCheck #{config_file}")
       end
 
+      # Servers asked for
+      server_filter = filters['server'].split(',') if filters.key?('server')
+
       # Establish defaults
       # First the default defaults
       defaults = {
@@ -66,6 +69,9 @@ module Foreplay
           next if instructions.key? key
           terminate("Required key #{key} not found in instructions for #{environment} environment.\nCheck #{config_file}")
         end
+
+        # Apply server filter
+        instructions[:servers] &= server_filter if server_filter
 
         deploy_role instructions
       end
@@ -137,6 +143,7 @@ module Foreplay
       instructions[:foreman]['app']   = current_service
       instructions[:foreman]['port']  = current_port
       instructions[:foreman]['user']  = user
+      instructions[:foreman]['log']   = "$HOME/#{path}"
 
       # Commands to execute on remote server
       steps = [

@@ -20,7 +20,6 @@ module Foreplay
     INDENT        = ' ' * 4
 
     def parse
-puts 'Hello world' # debug
       # Explain what we're going to do
       message = "#{mode.capitalize}ing #{environment.dup.yellow} environment, "
       message += "#{explanatory_text(filters, 'role')}, #{explanatory_text(filters, 'server')}"

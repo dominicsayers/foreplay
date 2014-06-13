@@ -95,7 +95,7 @@ describe Foreplay::Deploy do
       'sudo foreman export upstart /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',
       'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
-      'echo 50000 > .foreplay/foreplay/current_port',
+      'echo 50000 > $HOME/.foreplay/foreplay/current_port',
       'sleep 60',
       'sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 50000',
       'sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 51000',
@@ -112,7 +112,7 @@ describe Foreplay::Deploy do
 
   it "should use another port if there's already an installed instance" do
     process.stub(:on_output).and_yield(process, "50000\n")
-    shell.should_receive(:execute).with('echo 51000 > .foreplay/foreplay/current_port').and_return(process)
+    shell.should_receive(:execute).with('echo 51000 > $HOME/.foreplay/foreplay/current_port').and_return(process)
     Foreplay::Deploy.start [:deploy, 'production', '']
   end
 

@@ -188,7 +188,7 @@ module Foreplay
         {  command:      "sudo start #{current_service} || sudo restart #{current_service}",
            commentary:   'Starting the service',
            ignore_error: true },
-        {  command:      "echo #{current_port} > #{current_port_file}",
+        {  command:      "echo #{current_port} > $HOME/#{current_port_file}",
            commentary:   "Setting the port for the new instance to #{current_port}" },
         {  command:      'sleep 60',
            commentary:   'Waiting 60s to give service time to start' },

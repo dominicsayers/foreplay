@@ -23,4 +23,4 @@ CyclomaticComplexity:
 ClassLength:
   Description: 'Avoid classes longer than 100 lines of code.'
   CountComments: false  # count full line comments?
-  Max: 269
+  Max: 272

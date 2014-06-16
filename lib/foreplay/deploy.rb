@@ -143,7 +143,7 @@ module Foreplay
       instructions[:foreman]['app']   = current_service
       instructions[:foreman]['port']  = current_port
       instructions[:foreman]['user']  = user
-      instructions[:foreman]['log']   = "$HOME/#{path}"
+      instructions[:foreman]['log']   = "$HOME/#{path}/#{current_port}"
 
       # Commands to execute on remote server
       steps = [

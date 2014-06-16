@@ -7,21 +7,21 @@ Gem::Specification.new do |spec|
   spec.version       = Foreplay::VERSION
   spec.authors       = ['Xenapto']
   spec.email         = ['developers@xenapto.com']
-  spec.description   = %q{Deploying Rails projects to Ubuntu using Foreman}
-  spec.summary       = %q{Example: foreplay push to production}
+  spec.description   = %q(Deploying Rails projects to Ubuntu using Foreman)
+  spec.summary       = %q(Example: foreplay push to production)
   spec.homepage      = 'https://github.com/Xenapto/foreplay'
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features|coverage)/})
+  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
+  spec.executables   = spec.files.grep(/^bin\//) { |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(/^(test|spec|features|coverage)\//)
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'activesupport', '> 3.2'
   spec.add_runtime_dependency 'colorize', '~> 0.7'
   spec.add_runtime_dependency 'foreman', '~> 0.67'
   spec.add_runtime_dependency 'net-ssh-shell', '~> 0.2'
-  #spec.add_runtime_dependency 'thor', '~> 0.19' # Dependency of foreman anyway
+  # spec.add_runtime_dependency 'thor', '~> 0.19' # Dependency of foreman anyway
 
   spec.add_development_dependency 'bundler', '~> 1.6'
   spec.add_development_dependency 'rake', '~> 10.3'

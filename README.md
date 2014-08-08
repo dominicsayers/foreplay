@@ -1,6 +1,6 @@
 # Foreplay
 
-![Gem Version](http://img.shields.io/gem/v/foreplay.svg?style=flat)&nbsp;[![Coverage Status](https://img.shields.io/coveralls/Xenapto/foreplay.svg?style=flat)](https://coveralls.io/r/Xenapto/foreplay?branch=develop)
+![Gem Version](http://img.shields.io/gem/v/foreplay.svg?style=flat)&nbsp;[![Code Climate](http://img.shields.io/codeclimate/github/Xenapto/foreplay.svg?style=flat)](https://codeclimate.com/github/Xenapto/foreplay)&nbsp;[![Coverage Status](https://img.shields.io/coveralls/Xenapto/foreplay.svg?style=flat)](https://coveralls.io/r/Xenapto/foreplay?branch=develop)
 [![Developer status](http://img.shields.io/badge/developer-awesome-brightgreen.svg?style=flat)](http://xenapto.com)
 ![build status](https://circleci.com/gh/Xenapto/foreplay.png?circle-token=dd3a51864d33f6506b18a355bc901b90c0df3b3b)
 

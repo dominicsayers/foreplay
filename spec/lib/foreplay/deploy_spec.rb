@@ -11,7 +11,7 @@ describe Foreplay::Deploy do
   before :each do
     # Setup foreplay
     `rm -f config/foreplay.yml`
-    `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --password trollope`
+    `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web1.example.com web2.example.com -f apps/%a -u fred --password trollope`
 
     # Stub all the things
     Net::SSH.stub(:start).and_yield(session)
@@ -40,7 +40,7 @@ describe Foreplay::Deploy do
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
       .to raise_error(
         RuntimeError,
-        /.*No authentication methods supplied. You must supply a private key, key file or password in the configuration file*/
+        /.*No authentication methods supplied. You must supply a private key, key file or password in the configuration file.*/
       )
   end
 
@@ -48,18 +48,36 @@ describe Foreplay::Deploy do
     `rm -f config/foreplay.yml`
     `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --keyfile "/home/fred/no-such-file"`
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
-      .to raise_error(Errno::ENOENT, %r{.*No such file or directory @ rb_sysopen - /home/fred/no-such-file*})
+      .to raise_error(Errno::ENOENT, %r{.*No such file or directory @ rb_sysopen - /home/fred/no-such-file.*})
+  end
+
+  it 'complains if a mandatory key is missing from the config file' do
+    `sed -i 's/path:/pxth:/' config/foreplay.yml`
+
+    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
+      .to raise_error(
+        RuntimeError,
+        /.*Required key path not found in instructions for production environment.*/
+      )
+  end
+
+  it 'complains if we try to deploy an environment that isn\'t defined' do
+    expect { Foreplay::Deploy.start([:deploy, 'unknown', '']) }
+      .to raise_error(
+        RuntimeError,
+        /.*No deployment configuration defined for unknown environment.*/
+      )
   end
 
   it 'should terminate if a remote process exits with a non-zero status' do
     process.stub(:exit_status).and_return(1)
-    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }.to raise_error(RuntimeError, /.*output message*/)
+    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }.to raise_error(RuntimeError, /.*output message.*/)
   end
 
   it "should terminate if a connection can't be established with the remote server" do
     Net::SSH.unstub(:start)
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
-      .to raise_error(RuntimeError, /.*There was a problem starting an ssh session on web.example.com*/)
+      .to raise_error(RuntimeError, /.*There was a problem starting an ssh session on web1.example.com.*/)
   end
 
   it 'should check the config' do
@@ -68,13 +86,13 @@ describe Foreplay::Deploy do
   end
 
   it 'should deploy to the environment' do
-    Net::SSH.should_receive(:start).with('web.example.com', 'fred',  verbose: :warn, port: 22, password: 'trollope').and_yield(session)
+    Net::SSH.should_receive(:start).with('web1.example.com', 'fred',  verbose: :warn, port: 22, password: 'trollope').and_yield(session)
 
     [
-      'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone git@github.com:Xenapto/foreplay.git 50000',
+      'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone -b master git@github.com:Xenapto/foreplay.git 50000',
       'rvm rvmrc trust 50000',
       'rvm rvmrc warning ignore 50000',
-      'cd 50000',
+      'cd 50000 && mkdir -p log',
       'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
       'mkdir -p config',
       'echo "RAILS_ENV=production" > .env',

@@ -99,6 +99,7 @@ module Foreplay
       role        = instructions[:role]
       path        = instructions[:path]
       repository  = instructions[:repository]
+      branch      = instructions[:branch] || 'master'
       user        = instructions[:user]
       port        = instructions[:port]
       preposition = mode == :deploy ? 'to' : 'for'
@@ -143,19 +144,26 @@ module Foreplay
       instructions[:foreman]['app']   = current_service
       instructions[:foreman]['port']  = current_port
       instructions[:foreman]['user']  = user
-      instructions[:foreman]['log']   = "$HOME/#{path}/#{current_port}"
+      instructions[:foreman]['log']   = "$HOME/#{path}/#{current_port}/log"
+
+      # Contents of .env file
+      instructions[:env]['HOME']  = '$HOME'
+      instructions[:env]['SHELL'] = '$SHELL'
+      instructions[:env]['PATH']  = '$PATH:`which bundle`'
 
       # Commands to execute on remote server
       steps = [
-        {  command:      "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} && git clone #{repository} #{current_port}",
+        {  command:      "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} "\
+                         "&& git clone -b #{branch} #{repository} #{current_port}",
            commentary:   "Cloning repository #{repository}" },
         {  command:      "rvm rvmrc trust #{current_port}",
            commentary:   'Trusting the .rvmrc file for the new instance' },
         {  command:      "rvm rvmrc warning ignore #{current_port}",
            commentary:   'Ignoring the .rvmrc warning for the new instance' },
-        {  command:      "cd #{current_port}",
+        {  command:      "cd #{current_port} && mkdir -p log",
            commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby' },
-        {  command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
+        {  command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; '\
+                         'else echo "No .ruby-version file found" ; fi',
            commentary:   'If you have a .ruby-version file there may be a delay now while we install a new ruby' },
         {  command:      'mkdir -p config',
            commentary:   'Making sure the config directory exists' },
@@ -184,12 +192,6 @@ module Foreplay
            commentary:   'Using bundler to install the required gems in deployment mode' },
         {  command:      'sudo ln -f `which foreman` /usr/bin/foreman || echo Using default version of foreman',
            commentary:   'Setting the current version of foreman to be the default' },
-        {  command:      'echo HOME="$HOME" >> .env',
-           commentary:   'Adding home path to .env (foreplay issue #443)' },
-        {  command:      'echo SHELL="$SHELL" >> .env',
-           commentary:   'Adding shell path to .env (foreplay issue #443)' },
-        {  command:      'echo PATH="$PATH:`which bundle`" >> .env',
-           commentary:   'Adding bundler path to .env (foreplay issue #443)' },
         {  command:      'sudo foreman export upstart /etc/init',
            commentary:   "Converting #{current_service} to an upstart service" },
         {  command:      "sudo start #{current_service} || sudo restart #{current_service}",

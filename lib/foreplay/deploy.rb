@@ -153,7 +153,8 @@ module Foreplay
 
       # Commands to execute on remote server
       steps = [
-        {  command:      "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} && git clone -b #{branch} #{repository} #{current_port}",
+        {  command:      "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} "\
+                         "&& git clone -b #{branch} #{repository} #{current_port}",
            commentary:   "Cloning repository #{repository}" },
         {  command:      "rvm rvmrc trust #{current_port}",
            commentary:   'Trusting the .rvmrc file for the new instance' },
@@ -161,7 +162,8 @@ module Foreplay
            commentary:   'Ignoring the .rvmrc warning for the new instance' },
         {  command:      "cd #{current_port} && mkdir -p log",
            commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby' },
-        {  command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
+        {  command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; '\
+                         'else echo "No .ruby-version file found" ; fi',
            commentary:   'If you have a .ruby-version file there may be a delay now while we install a new ruby' },
         {  command:      'mkdir -p config',
            commentary:   'Making sure the config directory exists' },

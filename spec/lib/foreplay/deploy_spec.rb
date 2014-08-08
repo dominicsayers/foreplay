@@ -89,7 +89,7 @@ describe Foreplay::Deploy do
     Net::SSH.should_receive(:start).with('web1.example.com', 'fred',  verbose: :warn, port: 22, password: 'trollope').and_yield(session)
 
     [
-      'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone git@github.com:Xenapto/foreplay.git 50000',
+      'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone -b master git@github.com:Xenapto/foreplay.git 50000',
       'rvm rvmrc trust 50000',
       'rvm rvmrc warning ignore 50000',
       'cd 50000 && mkdir -p log',

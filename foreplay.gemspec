@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.version       = Foreplay::VERSION
   spec.authors       = ['Xenapto']
   spec.email         = ['developers@xenapto.com']
-  spec.description   = %q(Deploying Rails projects to Ubuntu using Foreman)
-  spec.summary       = %q(Example: foreplay push to production)
+  spec.description   = 'Deploying Rails projects to Ubuntu using Foreman'
+  spec.summary       = 'Example: foreplay push to production'
   spec.homepage      = 'https://github.com/Xenapto/foreplay'
   spec.license       = 'MIT'
 

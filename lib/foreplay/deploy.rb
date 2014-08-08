@@ -160,13 +160,11 @@ module Foreplay
            commentary:   'Trusting the .rvmrc file for the new instance' },
         {  command:      "rvm rvmrc warning ignore #{current_port}",
            commentary:   'Ignoring the .rvmrc warning for the new instance' },
-        {  command:      "cd #{current_port} && mkdir -p log",
+        {  command:      "cd #{current_port} && mkdir -p tmp doc log config",
            commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby' },
         {  command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; '\
                          'else echo "No .ruby-version file found" ; fi',
            commentary:   'If you have a .ruby-version file there may be a delay now while we install a new ruby' },
-        {  command:      'mkdir -p config',
-           commentary:   'Making sure the config directory exists' },
         {  key:          :env,
            delimiter:    '=',
            prefix:       '.',
@@ -346,7 +344,7 @@ module Foreplay
         redirect  = '>'
       end
 
-      if instructions[key].kind_of?(Hash)
+      if instructions[key].is_a? Hash
         instructions[key].each do |k, v|
           commands << "echo \"#{before}#{k}#{delimiter}#{v}#{after}\" #{redirect} #{filename}"
           redirect = '>>'

@@ -35,7 +35,7 @@ module Foreplay
     method_option :db_adapter,  aliases: '-a'
     method_option :db_encoding, aliases: '-e'
     method_option :db_name,     aliases: '-d'
-    method_option :db_pool                      , type: :numeric
+    method_option :db_pool,                    type: :numeric
     method_option :db_host,     aliases: '-h'
     method_option :db_user
     method_option :db_password

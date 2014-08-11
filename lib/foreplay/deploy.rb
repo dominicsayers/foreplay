@@ -186,6 +186,8 @@ module Foreplay
            commentary:   'Building config/resque.yml',
            before:       environment,
            path:         'config/' },
+        {  command:      'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
+           commentary:   'Setting the current version of bundle to be the default' },
         {  command:      'bundle install --deployment --without development test',
            commentary:   'Using bundler to install the required gems in deployment mode' },
         {  command:      'sudo bundle exec foreman export upstart /etc/init',

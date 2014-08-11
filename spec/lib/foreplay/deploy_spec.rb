@@ -107,6 +107,7 @@ describe Foreplay::Deploy do
       'echo "  host: TODO Put here the database host name" >> config/database.yml',
       'echo "  username: TODO Put here the database user" >> config/database.yml',
       'echo "  password: TODO Put here the database user\'s password" >> config/database.yml',
+      'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       'bundle install --deployment --without development test',
       'sudo bundle exec foreman export upstart /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',

@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'activesupport', '> 3.2'
   spec.add_runtime_dependency 'colorize', '~> 0.7'
   spec.add_runtime_dependency 'foreman', '~> 0.67'
-  spec.add_runtime_dependency 'net-ssh-shell', '~> 0.2'
+  spec.add_runtime_dependency 'ssh-shell', '~> 0.4'
   # spec.add_runtime_dependency 'thor', '~> 0.19' # Dependency of foreman anyway
 
   spec.add_development_dependency 'bundler', '~> 1.6'

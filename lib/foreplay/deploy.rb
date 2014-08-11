@@ -155,7 +155,7 @@ module Foreplay
       steps = [
         {  command:      "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} "\
                          "&& git clone -b #{branch} #{repository} #{current_port}",
-           commentary:   "Cloning repository #{repository}" },
+           commentary:   "Cloning #{branch} branch of repository #{repository}" },
         {  command:      "rvm rvmrc trust #{current_port}",
            commentary:   'Trusting the .rvmrc file for the new instance' },
         {  command:      "rvm rvmrc warning ignore #{current_port}",

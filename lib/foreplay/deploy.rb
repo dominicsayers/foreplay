@@ -190,6 +190,9 @@ module Foreplay
            commentary:   'Setting the current version of bundle to be the default' },
         {  command:      'bundle install --deployment --without development test',
            commentary:   'Using bundler to install the required gems in deployment mode' },
+        {  command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
+                         " ; else RAILS_ENV=#{environment} bundle exec rake assets:precompile ; fi",
+           commentary:   'Precompiling assets unless they were supplied' },
         {  command:      'sudo bundle exec foreman export upstart /etc/init',
            commentary:   "Converting #{current_service} to an upstart service" },
         {  command:      "sudo start #{current_service} || sudo restart #{current_service}",

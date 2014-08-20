@@ -110,7 +110,7 @@ describe Foreplay::Deploy do
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       'bundle install --deployment --without development test',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
-      ' ; else RAILS_ENV=production bundle exec rake assets:precompile ; fi',
+      ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
       'sudo bundle exec foreman export upstart /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',
       'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',

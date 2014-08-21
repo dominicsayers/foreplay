@@ -186,10 +186,15 @@ module Foreplay
            commentary:   'Building config/resque.yml',
            before:       environment,
            path:         'config/' },
+        {  command:      'if [ -d ../cache/vendor/bundle ] ; then cp -rf ../cache/vendor/bundle vendor/bundle'\
+                         ' ; else echo No bundle to restore ; fi',
+           commentary:   'Attempting to restore bundle from cache' },
         {  command:      'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
            commentary:   'Setting the current version of bundle to be the default' },
-        {  command:      'bundle install --deployment --without development test',
+        {  command:      'bundle install --deployment --clean --jobs 2 --without development test',
            commentary:   'Using bundler to install the required gems in deployment mode' },
+        {  command:      'mkdir -p ../cache && cp -rf vendor/bundle ../cache/vendor/bundle',
+           commentary:   'Caching bundle' },
         {  command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
                          " ; else RAILS_ENV=#{environment} bundle exec foreman run rake assets:precompile ; fi",
            commentary:   'Precompiling assets unless they were supplied' },

@@ -17,7 +17,7 @@ module Foreplay
     argument :filters,      type: :hash,   required: false
 
     DEFAULTS_KEY  = 'defaults'
-    INDENT        = ' ' * 4
+    INDENT        = "\t"
 
     def parse
       # Explain what we're going to do
@@ -83,6 +83,7 @@ module Foreplay
 
     def deploy_role(instructions)
       servers     = instructions[:servers]
+      threads     = []
       preposition = mode == :deploy ? 'to' : 'for'
 
       if servers.length > 1
@@ -91,7 +92,8 @@ module Foreplay
         puts message
       end
 
-      servers.each { |server| deploy_to_server server, instructions }
+      servers.each { |server| threads << Thread.new { deploy_to_server server, instructions } }
+      threads.each { |thread| thread.join }
     end
 
     def deploy_to_server(server, instructions)
@@ -121,9 +123,9 @@ module Foreplay
       current_port_string = execute_on_server(steps, instructions).strip!
 
       if current_port_string.blank?
-        puts "#{INDENT}No instance is currently deployed"
+        puts "#{name}#{INDENT}No instance is currently deployed"
       else
-        "#{INDENT}Current instance is using port #{current_port_string}"
+        "#{name}#{INDENT}Current instance is using port #{current_port_string}"
       end
 
       current_port = current_port_string.to_i
@@ -230,6 +232,7 @@ module Foreplay
     end
 
     def execute_on_server(steps, instructions)
+      name        = instructions[:name]
       server_port = instructions[:server]
       user        = instructions[:user]
       password    = instructions[:password]
@@ -267,12 +270,12 @@ module Foreplay
       output = ''
 
       if mode == :deploy
-        puts "#{INDENT}Connecting to #{server} on port #{port}"
+        puts "#{name}#{INDENT}Connecting to #{server} on port #{port}"
 
         # SSH connection
         begin
           Net::SSH.start(server, user, options) do |session|
-            puts "#{INDENT}Successfully connected to #{server} on port #{port}"
+            puts "#{name}#{INDENT}Successfully connected to #{server} on port #{port}"
 
             session.shell do |sh|
               steps.each do |step|
@@ -292,7 +295,7 @@ module Foreplay
                   sh.wait!
 
                   if step[:ignore_error] == true || process.exit_status == 0
-                    print output.gsub!(/^/, INDENT * 2) unless step[:silent] == true || output.blank?
+                    print output.gsub!(/^/, "#{name}#{INDENT * 2}") unless step[:silent] == true || output.blank?
                   else
                     terminate(output)
                   end
@@ -301,14 +304,14 @@ module Foreplay
             end
           end
         rescue SocketError => e
-          terminate "There was a problem starting an ssh session on #{server_port}:\n#{e.message}"
+          terminate "#{name}#{INDENT}There was a problem starting an ssh session on #{server_port}:\n#{e.message}"
         end
       else
         # Deployment check: just say what we would have done
         steps.each do |step|
           commands = build_step step, instructions
 
-          commands.each { |command| puts "#{INDENT * 2}#{command}" unless step[:silent] }
+          commands.each { |command| puts "#{name}#{INDENT * 2}#{command}" unless step[:silent] }
         end
       end
 
@@ -316,7 +319,7 @@ module Foreplay
     end
 
     def build_step(step, instructions)
-      puts "#{INDENT}#{(step[:commentary] || step[:command]).yellow}" unless step[:silent] == true
+      puts "#{instructions[:name]}#{INDENT}#{(step[:commentary] || step[:command]).yellow}" unless step[:silent] == true
 
       # Each step can be (1) a command or (2) a series of values to add to a file
       if step.key?(:key)

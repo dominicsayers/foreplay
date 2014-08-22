@@ -55,6 +55,7 @@ module Foreplay
 
       defaults = Foreplay::Utility.supermerge(defaults, config_all[DEFAULTS_KEY]) if config_all.key? DEFAULTS_KEY
       defaults = Foreplay::Utility.supermerge(defaults, config_env[DEFAULTS_KEY]) if config_env.key? DEFAULTS_KEY
+      threads = []
 
       config_env.each do |role, additional_instructions|
         next if role == DEFAULTS_KEY # 'defaults' is not a role
@@ -73,8 +74,10 @@ module Foreplay
         # Apply server filter
         instructions[:servers] &= server_filter if server_filter
 
-        deploy_role instructions
+        threads.concat deploy_role(instructions)
       end
+
+      threads.each { |thread| thread.join }
 
       puts mode == :deploy ? 'Finished deployment' : 'Deployment configuration check was successful'
     end
@@ -93,7 +96,7 @@ module Foreplay
       end
 
       servers.each { |server| threads << Thread.new { deploy_to_server server, instructions } }
-      threads.each { |thread| thread.join }
+      threads
     end
 
     def deploy_to_server(server_port, instructions)

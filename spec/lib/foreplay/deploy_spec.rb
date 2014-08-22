@@ -115,7 +115,7 @@ describe Foreplay::Deploy do
       ' ; else echo No bundle to restore ; fi',
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       'bundle install --deployment --clean --jobs 2 --without development test',
-      'mkdir -p ../cache && cp -rf vendor/bundle ../cache/vendor/bundle',
+      'mkdir -p ../cache/vendor && cp -rf vendor/bundle ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
       ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
       'sudo bundle exec foreman export upstart /etc/init',

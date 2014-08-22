@@ -96,7 +96,8 @@ module Foreplay
       threads.each { |thread| thread.join }
     end
 
-    def deploy_to_server(server, instructions)
+    def deploy_to_server(server_port, instructions)
+      server, _   = server_port.split(':') # Parse server + port
       name        = instructions[:name]
       role        = instructions[:role]
       path        = instructions[:path]
@@ -105,8 +106,6 @@ module Foreplay
       user        = instructions[:user]
       port        = instructions[:port]
       preposition = mode == :deploy ? 'to' : 'for'
-
-      instructions[:server] = server
 
       message = "#{mode.capitalize}ing #{name.yellow} #{preposition} #{server.yellow} "
       message += "for the #{role.dup.yellow} role in the #{environment.dup.yellow} environment"
@@ -120,12 +119,12 @@ module Foreplay
       current_port_file = ".foreplay/#{name}/current_port"
       steps = [{ command: "mkdir -p .foreplay/#{name} && touch #{current_port_file} && cat #{current_port_file}", silent: true }]
 
-      current_port_string = execute_on_server(steps, instructions).strip!
+      current_port_string = execute_on_server(server_port, steps, instructions).strip!
 
       if current_port_string.blank?
-        puts "#{name}#{INDENT}No instance is currently deployed"
+        puts "#{server}#{INDENT}No instance is currently deployed"
       else
-        "#{name}#{INDENT}Current instance is using port #{current_port_string}"
+        "#{server}#{INDENT}Current instance is using port #{current_port_string}"
       end
 
       current_port = current_port_string.to_i
@@ -228,12 +227,10 @@ module Foreplay
            ignore_error: true }
       ]
 
-      execute_on_server steps, instructions
+      execute_on_server server_port, steps, instructions
     end
 
-    def execute_on_server(steps, instructions)
-      name        = instructions[:name]
-      server_port = instructions[:server]
+    def execute_on_server(server_port, steps, instructions)
       user        = instructions[:user]
       password    = instructions[:password]
       keyfile     = instructions[:keyfile]
@@ -241,8 +238,7 @@ module Foreplay
 
       keyfile.sub! '~', ENV['HOME'] || '/' unless keyfile.blank? # Remote shell won't expand this for us
 
-      # Parse server + port
-      server, port = server_port.split(':')
+      server, port = server_port.split(':') # Parse server + port
       port ||= 22
 
       # SSH authentication methods
@@ -270,19 +266,19 @@ module Foreplay
       output = ''
 
       if mode == :deploy
-        puts "#{name}#{INDENT}Connecting to #{server} on port #{port}"
+        puts "#{server}#{INDENT}Connecting to #{server} on port #{port}"
 
         # SSH connection
         begin
           Net::SSH.start(server, user, options) do |session|
-            puts "#{name}#{INDENT}Successfully connected to #{server} on port #{port}"
+            puts "#{server}#{INDENT}Successfully connected to #{server} on port #{port}"
 
             session.shell do |sh|
               steps.each do |step|
                 # Output from this step
                 output    = ''
                 previous  = '' # We don't need or want the final CRLF
-                commands  = build_step step, instructions
+                commands  = build_step server, step, instructions
 
                 commands.each do |command|
                   process = sh.execute command
@@ -295,7 +291,7 @@ module Foreplay
                   sh.wait!
 
                   if step[:ignore_error] == true || process.exit_status == 0
-                    print output.gsub!(/^/, "#{name}#{INDENT * 2}") unless step[:silent] == true || output.blank?
+                    print output.gsub!(/^/, "#{server}#{INDENT * 2}") unless step[:silent] == true || output.blank?
                   else
                     terminate(output)
                   end
@@ -304,22 +300,22 @@ module Foreplay
             end
           end
         rescue SocketError => e
-          terminate "#{name}#{INDENT}There was a problem starting an ssh session on #{server_port}:\n#{e.message}"
+          terminate "#{server}#{INDENT}There was a problem starting an ssh session on #{server_port}:\n#{e.message}"
         end
       else
         # Deployment check: just say what we would have done
         steps.each do |step|
-          commands = build_step step, instructions
+          commands = build_step server, step, instructions
 
-          commands.each { |command| puts "#{name}#{INDENT * 2}#{command}" unless step[:silent] }
+          commands.each { |command| puts "#{server}#{INDENT * 2}#{command}" unless step[:silent] }
         end
       end
 
       output
     end
 
-    def build_step(step, instructions)
-      puts "#{instructions[:name]}#{INDENT}#{(step[:commentary] || step[:command]).yellow}" unless step[:silent] == true
+    def build_step(server, step, instructions)
+      puts "#{server}#{INDENT}#{(step[:commentary] || step[:command]).yellow}" unless step[:silent] == true
 
       # Each step can be (1) a command or (2) a series of values to add to a file
       if step.key?(:key)

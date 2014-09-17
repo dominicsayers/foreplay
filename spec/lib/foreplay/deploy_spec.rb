@@ -86,7 +86,11 @@ describe Foreplay::Deploy do
   end
 
   it 'should deploy to the environment' do
-    Net::SSH.should_receive(:start).with('web1.example.com', 'fred',  verbose: :warn, port: 22, password: 'trollope').and_yield(session)
+    Net::SSH
+      .should_receive(:start)
+      .with(/web[12].example.com/, 'fred',  verbose: :warn, port: 22, password: 'trollope')
+      .exactly(4).times
+      .and_yield(session)
 
     [
       'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone -b master git@github.com:Xenapto/foreplay.git 50000',
@@ -111,7 +115,7 @@ describe Foreplay::Deploy do
       ' ; else echo No bundle to restore ; fi',
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       'bundle install --deployment --clean --jobs 2 --without development test',
-      'mkdir -p ../cache && cp -rf vendor/bundle ../cache/vendor/bundle',
+      'mkdir -p ../cache/vendor && cp -rf vendor/bundle ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
       ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
       'sudo bundle exec foreman export upstart /etc/init',

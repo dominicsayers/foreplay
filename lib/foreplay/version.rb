@@ -1,3 +1,3 @@
 module Foreplay
-  VERSION = '0.4.0'
+  VERSION = '0.5.3'
 end

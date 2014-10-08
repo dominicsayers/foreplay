@@ -111,11 +111,13 @@ describe Foreplay::Deploy do
       'echo "  host: TODO Put here the database host name" >> config/database.yml',
       'echo "  username: TODO Put here the database user" >> config/database.yml',
       'echo "  password: TODO Put here the database user\'s password" >> config/database.yml',
-      'if [ -d ../cache/vendor/bundle ] ; then cp -rf ../cache/vendor/bundle vendor/bundle'\
+      'if [ -d ../cache/vendor/bundle/bundle ] ; then rm -rf ../cache/vendor/bundle/bundle'\
+      ' ; else echo No evidence of legacy copy bug ; fi',
+      'if [ -d ../cache/vendor/bundle ] ; then rsync -aW --no-compress ../cache/vendor/bundle/ vendor/bundle'\
       ' ; else echo No bundle to restore ; fi',
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       'bundle install --deployment --clean --jobs 2 --without development test',
-      'mkdir -p ../cache/vendor && cp -rf vendor/bundle ../cache/vendor/bundle',
+      'mkdir -p ../cache/vendor && rsync -av --no-compress vendor/bundle/ ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
       ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
       'sudo bundle exec foreman export upstart /etc/init',

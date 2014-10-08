@@ -190,14 +190,17 @@ module Foreplay
            commentary:   'Building config/resque.yml',
            before:       environment,
            path:         'config/' },
-        {  command:      'if [ -d ../cache/vendor/bundle ] ; then cp -rf ../cache/vendor/bundle vendor/bundle'\
+        {  command:      'if [ -d ../cache/vendor/bundle/bundle ] ; then rm -rf ../cache/vendor/bundle/bundle'\
+                         ' ; else echo No evidence of legacy copy bug ; fi',
+           commentary:   'Fixing legacy copy bug' },
+        {  command:      'if [ -d ../cache/vendor/bundle ] ; then rsync -aW --no-compress ../cache/vendor/bundle/ vendor/bundle'\
                          ' ; else echo No bundle to restore ; fi',
            commentary:   'Attempting to restore bundle from cache' },
         {  command:      'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
            commentary:   'Setting the current version of bundle to be the default' },
         {  command:      'bundle install --deployment --clean --jobs 2 --without development test',
            commentary:   'Using bundler to install the required gems in deployment mode' },
-        {  command:      'mkdir -p ../cache/vendor && cp -rf vendor/bundle ../cache/vendor/bundle',
+        {  command:      'mkdir -p ../cache/vendor && rsync -av --no-compress vendor/bundle/ ../cache/vendor/bundle',
            commentary:   'Caching bundle' },
         {  command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
                          " ; else RAILS_ENV=#{environment} bundle exec foreman run rake assets:precompile ; fi",

@@ -164,6 +164,8 @@ module Foreplay
            commentary:   'Trusting the .rvmrc file for the new instance' },
         {  command:      "rvm rvmrc warning ignore #{current_port}",
            commentary:   'Ignoring the .rvmrc warning for the new instance' },
+        {  command:      'gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3',
+           commentary:   "Trusting RVM's public key" },
         {  command:      "cd #{current_port} && mkdir -p tmp doc log config",
            commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby' },
         {  command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; '\

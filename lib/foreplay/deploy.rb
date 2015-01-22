@@ -157,9 +157,8 @@ module Foreplay
 
       # Commands to execute on remote server
       steps = [
-        {  command:      "echo Foreplay version #{VERSION} running from #{`hostname -f`}" \
-                         "#{`which foreman`}",
-           commentary:   'Announcing myself' },
+        {  command:      "echo Foreplay version #{VERSION}",
+           commentary:   "Foreplay running from #{`hostname -f`}#{`which foreman`}" },
         {  command:      "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} "\
                          "&& git clone -b #{branch} #{repository} #{current_port}",
            commentary:   "Cloning #{branch} branch of repository #{repository}" },

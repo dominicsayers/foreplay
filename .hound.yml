@@ -30,6 +30,9 @@ CyclomaticComplexity:
   Description: 'Avoid complex methods.'
   Max: 13
 
+PerceivedComplexity:
+  Max: 17
+
 ClassLength:
   Description: 'Avoid classes longer than 100 lines of code.'
   CountComments: false  # count full line comments?

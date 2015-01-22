@@ -7,7 +7,8 @@ module Foreplay
     #   h1.supermerge(h2)
     #   #=> {:x=>{:y=>[4, 5, 6, 7, 8, 9]}, :z=>[7, 8, 9, "xyz"]}
     def self.supermerge(hash, other_hash)
-      fail 'supermerge only works if you pass two hashes' unless hash.is_a?(Hash) && other_hash.is_a?(Hash)
+      fail 'supermerge only works if you pass two hashes. '\
+        "You passed a #{hash.class} and a #{other_hash.class}." unless hash.is_a?(Hash) && other_hash.is_a?(Hash)
 
       new_hash = hash.deep_dup.with_indifferent_access
 

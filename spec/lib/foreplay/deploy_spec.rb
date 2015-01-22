@@ -86,15 +86,18 @@ describe Foreplay::Deploy do
   end
 
   it 'should deploy to the environment' do
-    Net::SSH.should_receive(:start).with('web1.example.com', 'fred',  verbose: :warn, port: 22, password: 'trollope').and_yield(session)
+    Net::SSH
+      .should_receive(:start)
+      .with(/web[12].example.com/, 'fred',  verbose: :warn, port: 22, password: 'trollope')
+      .exactly(4).times
+      .and_yield(session)
 
     [
       'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone -b master git@github.com:Xenapto/foreplay.git 50000',
       'rvm rvmrc trust 50000',
       'rvm rvmrc warning ignore 50000',
-      'cd 50000 && mkdir -p log',
+      'cd 50000 && mkdir -p tmp doc log config',
       'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
-      'mkdir -p config',
       'echo "RAILS_ENV=production" > .env',
       'echo "concurrency: web=1,worker=0,scheduler=0" > .foreman',
       'echo "app: foreplay-50000" >> .foreman',
@@ -108,9 +111,16 @@ describe Foreplay::Deploy do
       'echo "  host: TODO Put here the database host name" >> config/database.yml',
       'echo "  username: TODO Put here the database user" >> config/database.yml',
       'echo "  password: TODO Put here the database user\'s password" >> config/database.yml',
-      'bundle install --deployment --without development test',
-      'sudo ln -f `which foreman` /usr/bin/foreman || echo Using default version of foreman',
-      'sudo foreman export upstart /etc/init',
+      'if [ -d ../cache/vendor/bundle/bundle ] ; then rm -rf ../cache/vendor/bundle/bundle'\
+      ' ; else echo No evidence of legacy copy bug ; fi',
+      'if [ -d ../cache/vendor/bundle ] ; then rsync -avW --no-compress --delete ../cache/vendor/bundle/ vendor/bundle'\
+      ' ; else echo No bundle to restore ; fi',
+      'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
+      'bundle install --deployment --clean --jobs 2 --without development test',
+      'mkdir -p ../cache/vendor && rsync -avW --no-compress --delete vendor/bundle/ ../cache/vendor/bundle',
+      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
+      ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
+      'sudo bundle exec foreman export upstart /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',
       'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
       'echo 50000 > $HOME/.foreplay/foreplay/current_port',

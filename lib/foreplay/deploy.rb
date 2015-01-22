@@ -157,6 +157,9 @@ module Foreplay
 
       # Commands to execute on remote server
       steps = [
+        {  command:      "echo Foreplay version #{VERSION} running from #{`hostname -f`}" \
+                         "#{`which foreman`}",
+           commentary:   'Announcing myself' },
         {  command:      "mkdir -p #{path} && cd #{path} && rm -rf #{current_port} "\
                          "&& git clone -b #{branch} #{repository} #{current_port}",
            commentary:   "Cloning #{branch} branch of repository #{repository}" },
@@ -164,6 +167,8 @@ module Foreplay
            commentary:   'Trusting the .rvmrc file for the new instance' },
         {  command:      "rvm rvmrc warning ignore #{current_port}",
            commentary:   'Ignoring the .rvmrc warning for the new instance' },
+        {  command:      'gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3',
+           commentary:   "Trusting RVM's public key" },
         {  command:      "cd #{current_port} && mkdir -p tmp doc log config",
            commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby' },
         {  command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; '\
@@ -193,14 +198,15 @@ module Foreplay
         {  command:      'if [ -d ../cache/vendor/bundle/bundle ] ; then rm -rf ../cache/vendor/bundle/bundle'\
                          ' ; else echo No evidence of legacy copy bug ; fi',
            commentary:   'Fixing legacy copy bug' },
-        {  command:      'if [ -d ../cache/vendor/bundle ] ; then rsync -aW --no-compress ../cache/vendor/bundle/ vendor/bundle'\
-                         ' ; else echo No bundle to restore ; fi',
+        {  command:      'if [ -d ../cache/vendor/bundle ] ; then rsync -avW --no-compress --delete'\
+                         ' ../cache/vendor/bundle/ vendor/bundle ; else echo No bundle to restore ; fi',
            commentary:   'Attempting to restore bundle from cache' },
         {  command:      'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
            commentary:   'Setting the current version of bundle to be the default' },
         {  command:      'bundle install --deployment --clean --jobs 2 --without development test',
            commentary:   'Using bundler to install the required gems in deployment mode' },
-        {  command:      'mkdir -p ../cache/vendor && rsync -av --no-compress vendor/bundle/ ../cache/vendor/bundle',
+        {  command:      'mkdir -p ../cache/vendor && rsync -avW --no-compress --delete'\
+                         ' vendor/bundle/ ../cache/vendor/bundle',
            commentary:   'Caching bundle' },
         {  command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
                          " ; else RAILS_ENV=#{environment} bundle exec foreman run rake assets:precompile ; fi",

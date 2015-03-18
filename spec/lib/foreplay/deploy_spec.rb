@@ -3,10 +3,9 @@ require 'foreplay'
 require 'net/ssh/shell'
 
 describe Foreplay::Deploy do
-  let(:ssh)      { double(Net::SSH) }
-  let(:session)  { double(Net::SSH::Connection::Session) }
-  let(:shell)    { double(Net::SSH::Shell) }
-  let(:process)  { double(Net::SSH::Shell::Process) }
+  let(:session) { double(Net::SSH::Connection::Session) }
+  let(:shell)   { double(Net::SSH::Shell) }
+  let(:process) { double(Net::SSH::Shell::Process) }
 
   before :each do
     # Setup foreplay
@@ -14,12 +13,13 @@ describe Foreplay::Deploy do
     `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web1.example.com web2.example.com -f apps/%a -u fred --password trollope`
 
     # Stub all the things
-    Net::SSH.stub(:start).and_yield(session)
-    session.stub(:shell).and_yield(shell)
-    shell.stub(:execute).and_return(process)
-    shell.stub(:wait!).and_return(false)
-    process.stub(:on_output).and_yield(process, "output message\n")
-    process.stub(:exit_status).and_return(0)
+    allow(Net::SSH).to receive(:start).and_return(session)
+    allow(session).to receive(:close)
+    allow(session).to receive(:shell).and_yield(shell)
+    allow(shell).to receive(:execute).and_return(process)
+    allow(shell).to receive(:wait!).and_return(false)
+    allow(process).to receive(:on_output).and_yield(process, "output message\n")
+    allow(process).to receive(:exit_status).and_return(0)
   end
 
   it "should complain on check if there's no config file" do
@@ -70,27 +70,27 @@ describe Foreplay::Deploy do
   end
 
   it 'should terminate if a remote process exits with a non-zero status' do
-    process.stub(:exit_status).and_return(1)
+    allow(process).to receive(:exit_status).and_return(1)
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }.to raise_error(RuntimeError, /.*output message.*/)
   end
 
   it "should terminate if a connection can't be established with the remote server" do
-    Net::SSH.unstub(:start)
+    allow(Net::SSH).to receive(:start).and_call_original
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
       .to raise_error(RuntimeError, /.*There was a problem starting an ssh session on web1.example.com.*/)
   end
 
   it 'should check the config' do
-    $stdout.should_receive(:puts).at_least(:once)
+    expect($stdout).to receive(:puts).at_least(:once)
     Foreplay::Deploy.start [:check, 'production', '']
   end
 
   it 'should deploy to the environment' do
-    Net::SSH
-      .should_receive(:start)
+    expect(Net::SSH)
+      .to(receive(:start))
       .with(/web[12].example.com/, 'fred',  verbose: :warn, port: 22, password: 'trollope')
       .exactly(4).times
-      .and_yield(session)
+      .and_return(session)
 
     [
       'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone -b master git@github.com:Xenapto/foreplay.git 50000',
@@ -113,11 +113,11 @@ describe Foreplay::Deploy do
       'echo "  password: TODO Put here the database user\'s password" >> config/database.yml',
       'if [ -d ../cache/vendor/bundle/bundle ] ; then rm -rf ../cache/vendor/bundle/bundle'\
       ' ; else echo No evidence of legacy copy bug ; fi',
-      'if [ -d ../cache/vendor/bundle ] ; then rsync -avW --no-compress --delete ../cache/vendor/bundle/ vendor/bundle'\
+      'if [ -d ../cache/vendor/bundle ] ; then rsync -aW --no-compress --delete --info=STATS3 ../cache/vendor/bundle/ vendor/bundle'\
       ' ; else echo No bundle to restore ; fi',
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       'bundle install --deployment --clean --jobs 2 --without development test',
-      'mkdir -p ../cache/vendor && rsync -avW --no-compress --delete vendor/bundle/ ../cache/vendor/bundle',
+      'mkdir -p ../cache/vendor && rsync -aW --no-compress --delete --info=STATS3 vendor/bundle/ ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
       ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
       'sudo bundle exec foreman export upstart /etc/init',
@@ -132,25 +132,25 @@ describe Foreplay::Deploy do
       'sudo iptables-save -c | egrep REDIRECT --color=never',
       'sudo stop foreplay-51000 || echo \'No previous instance running\''
     ].each do |command|
-      shell.should_receive(:execute).with(command).and_return(process)
+      expect(shell).to receive(:execute).with(command).and_return(process)
     end
 
     Foreplay::Deploy.start [:deploy, 'production', '']
   end
 
-  it "should use another port if there's already an installed instance" do
-    process.stub(:on_output).and_yield(process, "50000\n")
-    shell.should_receive(:execute).with('echo 51000 > $HOME/.foreplay/foreplay/current_port').and_return(process)
+  it "uses another port if there's already an installed instance" do
+    allow(process).to receive(:on_output).and_yield(process, "50000\n")
+    expect(shell).to receive(:execute).with('echo 51000 > $HOME/.foreplay/foreplay/current_port').and_return(process)
     Foreplay::Deploy.start [:deploy, 'production', '']
   end
 
-  it 'should use the private key provided in the config file' do
+  it 'uses the private key provided in the config file' do
     `rm -f config/foreplay.yml`
     `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred -k "top secret private key"`
     Foreplay::Deploy.start([:deploy, 'production', ''])
   end
 
-  it 'should add Redis details for Resque' do
+  it 'adds Redis details for Resque' do
     `rm -f config/foreplay.yml`
     `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --resque-redis "redis://localhost:6379"`
     Foreplay::Deploy.start([:deploy, 'production', ''])

@@ -44,3 +44,6 @@ Output:
 
 AbcSize:
   Max: 60
+
+ExtraSpacing:
+  Enabled: false

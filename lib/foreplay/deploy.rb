@@ -77,7 +77,7 @@ module Foreplay
         threads.concat deploy_role(instructions)
       end
 
-      threads.each { |thread| thread.join }
+      threads.each(&:join)
 
       puts mode == :deploy ? 'Finished deployment' : 'Deployment configuration check was successful'
     end
@@ -166,7 +166,7 @@ module Foreplay
            commentary:   'Trusting the .rvmrc file for the new instance' },
         {  command:      "rvm rvmrc warning ignore #{current_port}",
            commentary:   'Ignoring the .rvmrc warning for the new instance' },
-        {  command:      'gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3',
+        {  command:      'gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys D39DC0E3',
            commentary:   "Trusting RVM's public key" },
         {  command:      "cd #{current_port} && mkdir -p tmp doc log config",
            commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby' },
@@ -280,39 +280,37 @@ module Foreplay
         puts "#{server}#{INDENT}Connecting to #{server} on port #{port}"
 
         # SSH connection
-        begin
-          Net::SSH.start(server, user, options) do |session|
-            puts "#{server}#{INDENT}Successfully connected to #{server} on port #{port}"
+        session = start_session(server, server_port, user, options)
 
-            session.shell do |sh|
-              steps.each do |step|
-                # Output from this step
-                output    = ''
-                previous  = '' # We don't need or want the final CRLF
-                commands  = build_step server, step, instructions
+        puts "#{server}#{INDENT}Successfully connected to #{server} on port #{port}"
 
-                commands.each do |command|
-                  process = sh.execute command
+        session.shell do |sh|
+          steps.each do |step|
+            # Output from this step
+            output    = ''
+            previous  = '' # We don't need or want the final CRLF
+            commands  = build_step server, step, instructions
 
-                  process.on_output do |_, o|
-                    previous  = o
-                    output    += previous
-                  end
+            commands.each do |command|
+              process = sh.execute command
 
-                  sh.wait!
+              process.on_output do |_, o|
+                previous  = o
+                output    += previous
+              end
 
-                  if step[:ignore_error] == true || process.exit_status == 0
-                    print output.gsub!(/^/, "#{server}#{INDENT * 2}") unless step[:silent] == true || output.blank?
-                  else
-                    terminate(output)
-                  end
-                end
+              sh.wait!
+
+              if step[:ignore_error] == true || process.exit_status == 0
+                print output.gsub!(/^/, "#{server}#{INDENT * 2}") unless step[:silent] == true || output.blank?
+              else
+                terminate(output)
               end
             end
           end
-        rescue SocketError => e
-          terminate "#{server}#{INDENT}There was a problem starting an ssh session on #{server_port}:\n#{e.message}"
         end
+
+        session.close
       else
         # Deployment check: just say what we would have done
         steps.each do |step|
@@ -323,6 +321,12 @@ module Foreplay
       end
 
       output
+    end
+
+    def start_session(server, server_port, user, options)
+      Net::SSH.start(server, user, options)
+    rescue SocketError => e
+      terminate "#{server}#{INDENT}There was a problem starting an ssh session on #{server_port}:\n#{e.message}"
     end
 
     def build_step(server, step, instructions)

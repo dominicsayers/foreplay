@@ -17,12 +17,12 @@
 
 namespace :foreplay do
   desc 'Push app to deployment targets'
-  task :push => :environment do
-    Foreplay::push
+  task push: :environment do
+    Foreplay.push
   end
 
   desc 'Check deployment configuration'
-  task :check => :environment do
-    Foreplay::push true
+  task check: :environment do
+    Foreplay.push true
   end
 end

@@ -15,7 +15,7 @@ module Foreplay
     class_option :servers,      aliases: '-s', type: :array
     class_option :db_adapter,   aliases: '-a', default: 'postgresql'
     class_option :db_encoding,  aliases: '-e', default: 'utf8'
-    class_option :db_pool,                        default: 5
+    class_option :db_pool,                     default: 5
     class_option :db_name,      aliases: '-d'
     class_option :db_host,      aliases: '-h'
     class_option :db_user

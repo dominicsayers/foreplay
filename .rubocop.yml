@@ -36,14 +36,14 @@ PerceivedComplexity:
 ClassLength:
   Description: 'Avoid classes longer than 100 lines of code.'
   CountComments: false  # count full line comments?
-  Max: 290
+  Max: 295
 
 Output:
   Description: 'Checks for calls to puts, print, etc.'
   Enabled: false
 
 AbcSize:
-  Max: 60
+  Max: 62
 
 ExtraSpacing:
   Enabled: false

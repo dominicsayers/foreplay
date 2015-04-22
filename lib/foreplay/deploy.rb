@@ -167,7 +167,8 @@ module Foreplay
         {  command:      "rvm rvmrc warning ignore #{current_port}",
            commentary:   'Ignoring the .rvmrc warning for the new instance' },
         {  command:      'gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys D39DC0E3',
-           commentary:   "Trusting RVM's public key" },
+           commentary:   "Trusting RVM's public key",
+           ignore_error: true },
         {  command:      "cd #{current_port} && mkdir -p tmp doc log config",
            commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby' },
         {  command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; '\
@@ -204,7 +205,7 @@ module Foreplay
            commentary:   'Setting the current version of bundle to be the default' },
         {  command:      'bundle install --deployment --clean --jobs 2 --without development test',
            commentary:   'Using bundler to install the required gems in deployment mode' },
-        {  command:      'mkdir -p ../cache/vendor && rsync -aW --no-compress --delete --info=STATS3'\
+        {  command:      'mkdir -p ../cache/vendor && rsync -aW --no-compress --delete --info=STATS1'\
                          ' vendor/bundle/ ../cache/vendor/bundle',
            commentary:   'Caching bundle' },
         {  command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
@@ -313,9 +314,13 @@ module Foreplay
         session.close
       else
         # Deployment check: just say what we would have done
+        puts "#{server}#{INDENT * 2}Connection options:"
+        options.each { |k, v| puts "#{server}#{INDENT * 2}#{k}: #{v}" }
+
+        puts "#{server}#{INDENT * 2}"
+        puts "#{server}#{INDENT * 2}Deployment instructions:"
         steps.each do |step|
           commands = build_step server, step, instructions
-
           commands.each { |command| puts "#{server}#{INDENT * 2}#{command}" unless step[:silent] }
         end
       end

@@ -22,19 +22,19 @@ describe Foreplay::Deploy do
     allow(process).to receive(:exit_status).and_return(0)
   end
 
-  it "should complain on check if there's no config file" do
+  it "complains on check if there's no config file" do
     `rm -f config/foreplay.yml`
     expect { Foreplay::Deploy.start([:check, 'production', '']) }
       .to raise_error(RuntimeError, /.*Please run foreplay setup or create the file manually.*/)
   end
 
-  it "should complain on deploy if there's no config file" do
+  it "complains on deploy if there's no config file" do
     `rm -f config/foreplay.yml`
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
       .to raise_error(RuntimeError, /.*Please run foreplay setup or create the file manually.*/)
   end
 
-  it 'should complain if there are no authentication methods defined in the config file' do
+  it 'complains if there are no authentication methods defined in the config file' do
     `rm -f config/foreplay.yml`
     `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --password ""`
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
@@ -44,7 +44,7 @@ describe Foreplay::Deploy do
       )
   end
 
-  it "should complain if the private keyfile defined in the config file doesn't exist" do
+  it "complains if the private keyfile defined in the config file doesn't exist" do
     `rm -f config/foreplay.yml`
     `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --keyfile "/home/fred/no-such-file"`
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
@@ -69,23 +69,23 @@ describe Foreplay::Deploy do
       )
   end
 
-  it 'should terminate if a remote process exits with a non-zero status' do
+  it 'terminates if a remote process exits with a non-zero status' do
     allow(process).to receive(:exit_status).and_return(1)
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }.to raise_error(RuntimeError, /.*output message.*/)
   end
 
-  it "should terminate if a connection can't be established with the remote server" do
+  it "terminates if a connection can't be established with the remote server" do
     allow(Net::SSH).to receive(:start).and_call_original
     expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
       .to raise_error(RuntimeError, /.*There was a problem starting an ssh session on web1.example.com.*/)
   end
 
-  it 'should check the config' do
+  it 'checks the config' do
     expect($stdout).to receive(:puts).at_least(:once)
     Foreplay::Deploy.start [:check, 'production', '']
   end
 
-  it 'should deploy to the environment' do
+  it 'deploys to the environment' do
     expect(Net::SSH)
       .to(receive(:start))
       .with(/web[12].example.com/, 'fred',  verbose: :warn, port: 22, password: 'trollope')
@@ -117,7 +117,7 @@ describe Foreplay::Deploy do
       ' ; else echo No bundle to restore ; fi',
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       'bundle install --deployment --clean --jobs 2 --without development test',
-      'mkdir -p ../cache/vendor && rsync -aW --no-compress --delete --info=STATS3 vendor/bundle/ ../cache/vendor/bundle',
+      'mkdir -p ../cache/vendor && rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
       ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
       'sudo bundle exec foreman export upstart /etc/init',

@@ -7,7 +7,7 @@ describe Foreplay::Setup do
   end
 
   it 'should create a config file' do
-    File.should_receive(:open)
+    expect(File).to receive(:open)
     Foreplay::Setup.start
   end
 end

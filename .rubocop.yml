@@ -26,16 +26,16 @@ Output:
 ExtraSpacing:
   Enabled: false
 
+FileName:
+  Description: 'Use snake_case for source file names.'
+  Enabled: true
+
 # Work on these:
 
 LineLength:
   Description: 'Limit lines to 137 characters.'
   Max: 120
   Enabled: true
-
-FileName:
-  Description: 'Use snake_case for source file names.'
-  Enabled: true #- false
 
 MethodLength:
   Description: 'Avoid methods longer than 10 lines of code.'
@@ -47,10 +47,6 @@ CyclomaticComplexity:
 
 PerceivedComplexity:
   Max: 11 # 17
-
-ClassLength:
-  Description: 'Avoid classes longer than 100 lines of code.'
-  CountComments: false  # count full line comments?
 
 AbcSize:
   Max: 48 # 62

@@ -110,7 +110,7 @@ class Foreplay::Engine::Server
 
     cp      = current_port_string.to_i
     port    = instructions[:port]
-    ports   = [post + 1000, port]
+    ports   = [port + 1000, port]
     cp, fp  = cp == port ? ports : ports.reverse
 
     @port_details = {

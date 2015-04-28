@@ -1,5 +1,4 @@
 require 'net/ssh'
-#- require 'net/ssh/shell'
 
 class Foreplay::Engine::Remote
   include Foreplay

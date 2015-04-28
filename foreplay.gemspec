@@ -18,18 +18,16 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'activesupport', '>= 3.2'
-  spec.add_runtime_dependency 'colorize', '>= 0.7'
   spec.add_runtime_dependency 'foreman', '>= 0.76'
   spec.add_runtime_dependency 'ssh-shell', '>= 0.4'
-  # spec.add_runtime_dependency 'thor', '~> 0.19' # Dependency of foreman anyway
 
-  spec.add_development_dependency 'bundler', '>= 1.6'
-  spec.add_development_dependency 'rake', '>= 10.3'
-  spec.add_development_dependency 'rspec', '>= 3.2'
-  spec.add_development_dependency 'cucumber', '>= 1.3'
-  spec.add_development_dependency 'aruba', '>= 0.5'
-  spec.add_development_dependency 'gem-release', '>= 0.7'
-  spec.add_development_dependency 'simplecov', '>= 0.7', '>= 0.7.1' # https://github.com/colszowka/simplecov/issues/281
-  spec.add_development_dependency 'coveralls', '>= 0.7'
-  spec.add_development_dependency 'rubocop', '> 0.29'
+  spec.add_development_dependency 'bundler', '~> 1.9'
+  spec.add_development_dependency 'rake', '~> 10.4'
+  spec.add_development_dependency 'rspec', '~> 3.2'
+  spec.add_development_dependency 'cucumber', '~> 2.0'
+  spec.add_development_dependency 'aruba', '~> 0.6'
+  spec.add_development_dependency 'gem-release', '~> 0.7'
+  spec.add_development_dependency 'simplecov', '~> 0.10'
+  spec.add_development_dependency 'coveralls', '~> 0.8'
+  spec.add_development_dependency 'rubocop', '~> 0.30'
 end

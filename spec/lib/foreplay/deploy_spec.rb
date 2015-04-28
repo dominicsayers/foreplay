@@ -1,8 +1,8 @@
 require 'spec_helper'
-require 'foreplay'
 require 'net/ssh/shell'
+require 'foreplay'
 
-describe Foreplay::Deploy do
+describe Foreplay::Launcher do
   let(:session) { double(Net::SSH::Connection::Session) }
   let(:shell)   { double(Net::SSH::Shell) }
   let(:process) { double(Net::SSH::Shell::Process) }
@@ -10,7 +10,13 @@ describe Foreplay::Deploy do
   before :each do
     # Setup foreplay
     `rm -f config/foreplay.yml`
-    `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web1.example.com web2.example.com -f apps/%a -u fred --password trollope`
+    command = 'foreplay setup '\
+              '-r git@github.com:Xenapto/foreplay.git '\
+              '-s web1.example.com web2.example.com '\
+              '-f apps/%a '\
+              '-u fred '\
+              '--password trollope'
+    `#{command}`
 
     # Stub all the things
     allow(Net::SSH).to receive(:start).and_return(session)
@@ -24,37 +30,68 @@ describe Foreplay::Deploy do
 
   it "complains on check if there's no config file" do
     `rm -f config/foreplay.yml`
-    expect { Foreplay::Deploy.start([:check, 'production', '']) }
+    expect { Foreplay::Launcher.start([:check, 'production', '']) }
       .to raise_error(RuntimeError, /.*Please run foreplay setup or create the file manually.*/)
   end
 
   it "complains on deploy if there's no config file" do
     `rm -f config/foreplay.yml`
-    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
+    expect { Foreplay::Launcher.start([:deploy, 'production', '']) }
       .to raise_error(RuntimeError, /.*Please run foreplay setup or create the file manually.*/)
   end
 
+  it 'complains on check if the config file is not valid YAML' do
+    `echo %*:*: > config/foreplay.yml`
+    expect { Foreplay::Launcher.start([:check, 'production', '']) }
+      .to raise_error(RuntimeError, /.*Please run foreplay setup or edit the file manually.*/)
+  end
+
+  it 'complains on deploy if the config file is not valid YAML' do
+    `echo %*:*: > config/foreplay.yml`
+    expect { Foreplay::Launcher.start([:deploy, 'production', '']) }
+      .to raise_error(RuntimeError, /.*Please run foreplay setup or edit the file manually.*/)
+  end
+
   it 'complains if there are no authentication methods defined in the config file' do
+    command = 'foreplay setup '\
+              '-r git@github.com:Xenapto/foreplay.git '\
+              '-s web.example.com '\
+              '-f apps/%a '\
+              '-u fred '\
+              '--password ""'
+
+    match = 'No authentication methods supplied. '\
+            'You must supply a private key, key file or password in the configuration file.'
+
     `rm -f config/foreplay.yml`
-    `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --password ""`
-    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
+    `#{command}`
+
+    expect { Foreplay::Launcher.start([:deploy, 'production', '']) }
       .to raise_error(
         RuntimeError,
-        /.*No authentication methods supplied. You must supply a private key, key file or password in the configuration file.*/
+        /.*#{Regexp.quote(match)}*/
       )
   end
 
   it "complains if the private keyfile defined in the config file doesn't exist" do
+    command = 'foreplay setup '\
+              '-r git@github.com:Xenapto/foreplay.git '\
+              '-s web.example.com '\
+              '-f apps/%a '\
+              '-u fred '\
+              '--keyfile "/home/fred/no-such-file"'
+
     `rm -f config/foreplay.yml`
-    `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --keyfile "/home/fred/no-such-file"`
-    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
+    `#{command}`
+
+    expect { Foreplay::Launcher.start([:deploy, 'production', '']) }
       .to raise_error(Errno::ENOENT, %r{.*No such file or directory @ rb_sysopen - /home/fred/no-such-file.*})
   end
 
   it 'complains if a mandatory key is missing from the config file' do
     `sed -i 's/path:/pxth:/' config/foreplay.yml`
 
-    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
+    expect { Foreplay::Launcher.start([:deploy, 'production', '']) }
       .to raise_error(
         RuntimeError,
         /.*Required key path not found in instructions for production environment.*/
@@ -62,7 +99,7 @@ describe Foreplay::Deploy do
   end
 
   it 'complains if we try to deploy an environment that isn\'t defined' do
-    expect { Foreplay::Deploy.start([:deploy, 'unknown', '']) }
+    expect { Foreplay::Launcher.start([:deploy, 'unknown', '']) }
       .to raise_error(
         RuntimeError,
         /.*No deployment configuration defined for unknown environment.*/
@@ -71,18 +108,18 @@ describe Foreplay::Deploy do
 
   it 'terminates if a remote process exits with a non-zero status' do
     allow(process).to receive(:exit_status).and_return(1)
-    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }.to raise_error(RuntimeError, /.*output message.*/)
+    expect { Foreplay::Launcher.start([:deploy, 'production', '']) }.to raise_error(RuntimeError, /.*output message.*/)
   end
 
   it "terminates if a connection can't be established with the remote server" do
     allow(Net::SSH).to receive(:start).and_call_original
-    expect { Foreplay::Deploy.start([:deploy, 'production', '']) }
+    expect { Foreplay::Launcher.start([:deploy, 'production', '']) }
       .to raise_error(RuntimeError, /.*There was a problem starting an ssh session on web1.example.com.*/)
   end
 
   it 'checks the config' do
     expect($stdout).to receive(:puts).at_least(:once)
-    Foreplay::Deploy.start [:check, 'production', '']
+    Foreplay::Launcher.start [:check, 'production', '']
   end
 
   it 'deploys to the environment' do
@@ -93,7 +130,9 @@ describe Foreplay::Deploy do
       .and_return(session)
 
     [
-      'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && git clone -b master git@github.com:Xenapto/foreplay.git 50000',
+      "echo Foreplay version #{Foreplay::VERSION}",
+      'mkdir -p apps/foreplay && cd apps/foreplay && rm -rf 50000 && '\
+      'git clone -b master git@github.com:Xenapto/foreplay.git 50000',
       'rvm rvmrc trust 50000',
       'rvm rvmrc warning ignore 50000',
       'cd 50000 && mkdir -p tmp doc log config',
@@ -113,11 +152,13 @@ describe Foreplay::Deploy do
       'echo "  password: TODO Put here the database user\'s password" >> config/database.yml',
       'if [ -d ../cache/vendor/bundle/bundle ] ; then rm -rf ../cache/vendor/bundle/bundle'\
       ' ; else echo No evidence of legacy copy bug ; fi',
-      'if [ -d ../cache/vendor/bundle ] ; then rsync -aW --no-compress --delete --info=STATS3 ../cache/vendor/bundle/ vendor/bundle'\
+      'if [ -d ../cache/vendor/bundle ] ; then '\
+      'rsync -aW --no-compress --delete --info=STATS1 ../cache/vendor/bundle/ vendor/bundle'\
       ' ; else echo No bundle to restore ; fi',
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       'bundle install --deployment --clean --jobs 2 --without development test',
-      'mkdir -p ../cache/vendor && rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle',
+      'mkdir -p ../cache/vendor && '\
+      'rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
       ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
       'sudo bundle exec foreman export upstart /etc/init',
@@ -135,24 +176,38 @@ describe Foreplay::Deploy do
       expect(shell).to receive(:execute).with(command).and_return(process)
     end
 
-    Foreplay::Deploy.start [:deploy, 'production', '']
+    Foreplay::Launcher.start [:deploy, 'production', '']
   end
 
   it "uses another port if there's already an installed instance" do
     allow(process).to receive(:on_output).and_yield(process, "50000\n")
     expect(shell).to receive(:execute).with('echo 51000 > $HOME/.foreplay/foreplay/current_port').and_return(process)
-    Foreplay::Deploy.start [:deploy, 'production', '']
+    Foreplay::Launcher.start [:deploy, 'production', '']
   end
 
   it 'uses the private key provided in the config file' do
+    command = 'foreplay setup '\
+              '-r git@github.com:Xenapto/foreplay.git '\
+              '-s web.example.com '\
+              '-f apps/%a '\
+              '-u fred '\
+              '-k "top secret private key"'
+
     `rm -f config/foreplay.yml`
-    `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred -k "top secret private key"`
-    Foreplay::Deploy.start([:deploy, 'production', ''])
+    `#{command}`
+    Foreplay::Launcher.start([:deploy, 'production', ''])
   end
 
   it 'adds Redis details for Resque' do
+    command = 'foreplay setup '\
+              '-r git@github.com:Xenapto/foreplay.git '\
+              '-s web.example.com '\
+              '-f apps/%a '\
+              '-u fred '\
+              '--resque-redis "redis://localhost:6379"'
+
     `rm -f config/foreplay.yml`
-    `foreplay setup -r git@github.com:Xenapto/foreplay.git -s web.example.com -f apps/%a -u fred --resque-redis "redis://localhost:6379"`
-    Foreplay::Deploy.start([:deploy, 'production', ''])
+    `#{command}`
+    Foreplay::Launcher.start([:deploy, 'production', ''])
   end
 end

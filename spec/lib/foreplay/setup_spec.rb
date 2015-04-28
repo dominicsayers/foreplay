@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'foreplay'
+require 'foreplay/setup'
 
 describe Foreplay::Setup do
   before :each do

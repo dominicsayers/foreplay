@@ -1,4 +1,6 @@
 ---
+# These are OK:
+
 StringLiterals:
   EnforcedStyle: single_quotes
   Enabled: true
@@ -6,44 +8,45 @@ StringLiterals:
 DotPosition:
   Description: 'Checks the position of the dot in multi-line method calls.'
   EnforcedStyle: leading
-  # EnforcedStyle: trailing
   Enabled: true
 
-LineLength:
-  Description: 'Limit lines to 137 characters.'
-  Max: 137
+ClassAndModuleChildren:
+  Description: 'Checks style of children classes and modules.'
+  EnforcedStyle: compact
   Enabled: true
-
-FileName:
-  Description: 'Use snake_case for source file names.'
-  Enabled: false
-
-MethodLength:
-  Description: 'Avoid methods longer than 10 lines of code.'
-  Enabled: false
 
 Documentation:
   Description: 'Document classes and non-namespace modules.'
   Enabled: false
 
-CyclomaticComplexity:
-  Description: 'Avoid complex methods.'
-  Max: 13
-
-PerceivedComplexity:
-  Max: 17
-
-ClassLength:
-  Description: 'Avoid classes longer than 100 lines of code.'
-  CountComments: false  # count full line comments?
-  Max: 295
-
 Output:
   Description: 'Checks for calls to puts, print, etc.'
   Enabled: false
 
-AbcSize:
-  Max: 62
-
 ExtraSpacing:
   Enabled: false
+
+FileName:
+  Description: 'Use snake_case for source file names.'
+  Enabled: true
+
+# Work on these:
+
+LineLength:
+  Description: 'Limit lines to 137 characters.'
+  Max: 120
+  Enabled: true
+
+MethodLength:
+  Description: 'Avoid methods longer than 10 lines of code.'
+  Max: 27 # 85
+
+CyclomaticComplexity:
+  Description: 'Avoid complex methods.'
+  Max: 9
+
+PerceivedComplexity:
+  Max: 11 # 17
+
+AbcSize:
+  Max: 48 # 62

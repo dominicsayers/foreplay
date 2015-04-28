@@ -8,13 +8,13 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Xenapto']
   spec.email         = ['developers@xenapto.com']
   spec.description   = 'Deploying Rails projects to Ubuntu using Foreman'
-  spec.summary       = 'Example: foreplay push to production'
+  spec.summary       = 'Example: foreplay deploy production'
   spec.homepage      = 'https://github.com/Xenapto/foreplay'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
-  spec.executables   = spec.files.grep(/^bin\//) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(/^(test|spec|features|coverage)\//)
+  spec.executables   = spec.files.grep(%r{^bin\/}) { |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(%r{^(test|spec|features|coverage)\/})
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'activesupport', '>= 3.2'

@@ -1,8 +1,8 @@
 ---
 - command:      "echo Foreplay version <%= VERSION %>"
   commentary:   "Foreplay running from <%= `hostname -f` %><%= `which foreman` %>"
-- command:      "mkdir -p <%= path %> && cd <%= path %> && rm -rf <%= current_port %> && git clone -b <%= instructions[:branch] || 'master' %> <%= instructions[:repository] %> <%= current_port %>"
-  commentary:   "Cloning <%= instructions[:branch] || 'master' %> branch of repository <%= instructions[:repository] %>"
+- command:      "mkdir -p <%= path %> && cd <%= path %> && rm -rf <%= current_port %> && git clone -b <%= instructions['branch'] || 'master' %> <%= instructions['repository'] %> <%= current_port %>"
+  commentary:   "Cloning <%= instructions['branch'] || 'master' %> branch of repository <%= instructions['repository'] %>"
 - command:      "rvm rvmrc trust <%= current_port %>"
   commentary:   'Trusting the .rvmrc file for the new instance'
 - command:      "rvm rvmrc warning ignore <%= current_port %>"
@@ -14,22 +14,29 @@
   commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby'
 - command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi'
   commentary:   'If you have a .ruby-version file there may be a delay now while we install a new ruby'
-- key:          :env
+- key:          'env'
   delimiter:    '='
   prefix:       '.'
   commentary:   'Building .env'
-- key:          :foreman
+- key:          'foreman'
   delimiter:    ': '
   prefix:       '.'
   commentary:   'Building .foreman'
-- key:          :database
+- key:          'database'
   delimiter:    ': '
   suffix:       '.yml'
   commentary:   'Building config/database.yml'
   before:       '  '
   header:       "<%= environment %>:"
   path:         'config/'
-- key:          :resque
+- key:          'application'
+  delimiter:    ': '
+  suffix:       '.yml'
+  commentary:   'Building config/application.yml'
+  before:       '  '
+  header:       "<%= environment %>:"
+  path:         'config/'
+- key:          'resque'
   delimiter:    ': '
   suffix:       '.yml'
   commentary:   'Building config/resque.yml'

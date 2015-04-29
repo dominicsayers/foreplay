@@ -1,5 +1,3 @@
-require 'active_support/inflector'
-
 class Foreplay::Engine::Server
   include Foreplay
   attr_reader :environment, :mode, :instructions, :server
@@ -18,35 +16,36 @@ class Foreplay::Engine::Server
     message += "for the #{role.dup.yellow} role in the #{environment.dup.yellow} environment"
     puts message
 
-    instructions[:foreman]['app']   = current_service
-    instructions[:foreman]['port']  = current_port
-    instructions[:foreman]['user']  = user
-    instructions[:foreman]['log']   = "$HOME/#{path}/#{current_port}/log"
+    # Contents of .foreman file
+    instructions['foreman']['app']   = current_service
+    instructions['foreman']['port']  = current_port
+    instructions['foreman']['user']  = user
+    instructions['foreman']['log']   = "$HOME/#{path}/#{current_port}/log"
 
     # Contents of .env file
-    instructions[:env]['HOME']  = '$HOME'
-    instructions[:env]['SHELL'] = '$SHELL'
-    instructions[:env]['PATH']  = '$PATH:`which bundle`'
+    instructions['env']['HOME']  = '$HOME'
+    instructions['env']['SHELL'] = '$SHELL'
+    instructions['env']['PATH']  = '$PATH:`which bundle`'
 
     Foreplay::Engine::Remote.new(server, steps, instructions).__send__ mode
   end
 
   def role
-    @role ||= instructions[:role]
+    @role ||= instructions['role']
   end
 
   def user
-    @user ||= instructions[:user]
+    @user ||= instructions['user']
   end
 
   def name
-    @name ||= instructions[:name]
+    @name ||= instructions['name']
   end
 
   def path
     return @path if @path
 
-    @path = instructions[:path]
+    @path = instructions['path']
     @path.gsub! '%u', user
     @path.gsub! '%a', name
     @path
@@ -69,19 +68,19 @@ class Foreplay::Engine::Server
   end
 
   def current_port
-    @current_port ||= port_details[:current_port]
+    @current_port ||= port_details['current_port']
   end
 
   def current_service
-    @current_service ||= port_details[:current_service]
+    @current_service ||= port_details['current_service']
   end
 
   def former_port
-    @former_port ||= port_details[:former_port]
+    @former_port ||= port_details['former_port']
   end
 
   def former_service
-    @former_service ||= port_details[:former_service]
+    @former_service ||= port_details['former_service']
   end
 
   def current_port_file
@@ -109,15 +108,15 @@ class Foreplay::Engine::Server
     end
 
     cp      = current_port_string.to_i
-    port    = instructions[:port]
+    port    = instructions['port']
     ports   = [port + 1000, port]
     cp, fp  = cp == port ? ports : ports.reverse
 
     @port_details = {
-      current_port: cp,
-      current_service: "#{name}-#{cp}",
-      former_port: fp,
-      former_service: "#{name}-#{fp}"
+      'current_port'    => cp,
+      'current_service' => "#{name}-#{cp}",
+      'former_port'     => fp,
+      'former_service'  => "#{name}-#{fp}"
     }
   end
 end

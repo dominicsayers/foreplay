@@ -7,6 +7,7 @@ class Foreplay::CLI < Thor
 
   method_option :role,        aliases: '-r'
   method_option :server,      aliases: '-s'
+  method_option :config_file, aliases: '-f'
 
   def deploy(environment)
     Foreplay::Launcher.start [:deploy, environment, options]
@@ -16,6 +17,7 @@ class Foreplay::CLI < Thor
 
   method_option :role,        aliases: '-r'
   method_option :server,      aliases: '-s'
+  method_option :config_file, aliases: '-f'
 
   def check(environment)
     Foreplay::Launcher.start [:check, environment, options]

@@ -1,4 +1,5 @@
 require 'net/ssh'
+require 'pp' # debug
 
 class Foreplay::Engine::Remote
   include Foreplay
@@ -56,15 +57,29 @@ class Foreplay::Engine::Remote
   def check
     steps.each do |step|
       puts "#{host}#{INDENT}#{(step['commentary'] || step['command']).yellow}" unless step['silent'] == true
-      commands = Foreplay::Engine::Step.new(step, instructions).build
-      commands.each { |command| puts "#{host}#{INDENT * 2}#{command}" unless step['silent'] }
+
+      if step.key? 'key'
+        i = instructions[step['key']]
+
+        if i.is_a? Hash
+          i.each { |k, v| puts "#{host}#{INDENT * 2}#{k}: #{v}" }
+        else
+          puts "#{host}#{INDENT * 2}#{i}"
+        end
+      else
+        commands = Foreplay::Engine::Step.new(step, instructions).build
+
+        commands.each do |command|
+          puts "#{host}#{INDENT * 2}#{command}" unless step['silent']
+        end
+      end
     end
 
     ''
   end
 
   def user
-    @user = instructions[:user]
+    @user = instructions['user']
   end
 
   def host
@@ -82,9 +97,9 @@ class Foreplay::Engine::Remote
   def options
     return @options if @options
 
-    password    = instructions[:password]
-    keyfile     = instructions[:keyfile]
-    private_key = instructions[:private_key]
+    password    = instructions['password']
+    keyfile     = instructions['keyfile']
+    private_key = instructions['private_key']
 
     keyfile.sub! '~', ENV['HOME'] || '/' unless keyfile.blank? # Remote shell won't expand this for us
 
@@ -104,10 +119,10 @@ class Foreplay::Engine::Remote
         puts "#{INDENT}Using private key from the configuration file"
       end
 
-      @options[:key_data] = [private_key]
+      @options['key_data'] = [private_key]
     else
       # Use the password supplied
-      @options[:password] = password
+      @options['password'] = password
     end
 
     @options

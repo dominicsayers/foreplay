@@ -1,12 +1,13 @@
 require 'yaml'
 require 'string'
+require 'active_support/core_ext/object'
 
 class Foreplay::Engine
   include Foreplay
-  attr_reader :environment, :filters, :mode
+  attr_reader :mode, :environment, :filters
 
-  DEFAULTS_KEY  = 'defaults'
-  CONFIG_FILE   = "#{Dir.getwd}/config/foreplay.yml"
+  DEFAULT_CONFIG_FILE = "#{Dir.getwd}/config/foreplay.yml"
+  DEFAULTS_KEY        = 'defaults'
 
   def initialize(e, f)
     @environment  = e
@@ -56,7 +57,7 @@ class Foreplay::Engine
     fail 'supermerge only works if you pass two hashes. '\
       "You passed a #{hash.class} and a #{other_hash.class}." unless hash.is_a?(Hash) && other_hash.is_a?(Hash)
 
-    new_hash = hash.deep_dup.with_indifferent_access
+    new_hash = hash.deep_dup
 
     other_hash.each_pair do |k, v|
       tv = new_hash[k]
@@ -76,26 +77,30 @@ class Foreplay::Engine
   private
 
   def explanatory_text(hsh, key)
-    hsh.key?(key) ? "#{hsh[key].dup.yellow} #{key}" : "all #{key.pluralize}"
+    hsh.key?(key) ? "#{hsh[key].dup.yellow} #{key}" : "all #{key}s"
   end
 
   def build_instructions(role, additional_instructions)
-    instructions        = supermerge(defaults, additional_instructions).symbolize_keys
-    instructions[:role] = role
-    required_keys       = [:name, :environment, :role, :servers, :path, :repository]
+    instructions          = supermerge(defaults, additional_instructions)
+    instructions['role']  = role
+    required_keys         = %w(name environment role servers path repository)
 
     required_keys.each do |key|
       next if instructions.key? key
-      terminate("Required key #{key} not found in instructions for #{environment} environment.\nCheck #{CONFIG_FILE}")
+      terminate("Required key #{key} not found in instructions for #{environment} environment.\nCheck #{config_file}")
     end
 
     # Apply server filter
-    instructions[:servers] &= server_filter if server_filter
+    instructions['servers'] &= server_filter if server_filter
     instructions
   end
 
   def server_filter
     @server_filter ||= filters['server'].split(',') if filters.key?('server')
+  end
+
+  def config_file
+    @config_file ||= (filters['config_file'] || DEFAULT_CONFIG_FILE)
   end
 
   def defaults
@@ -104,14 +109,20 @@ class Foreplay::Engine
     # Establish defaults
     # First the default defaults
     @defaults = {
-      name:         File.basename(Dir.getwd),
-      environment:  environment,
-      env:          { 'RAILS_ENV' => environment },
-      port:         50_000
+      'name'        =>  File.basename(Dir.getwd),
+      'environment' =>  environment,
+      'env'         =>  { 'RAILS_ENV' => environment },
+      'port'        =>  50_000
     }
+
+    # Add secret environment variables
+    secrets = Foreplay::Engine::Secrets.new(environment, roles_all['secrets']).fetch
+    @defaults['env'] = @defaults['env'].merge secrets
+    @defaults['application'] = secrets
 
     @defaults = supermerge(@defaults, roles_all[DEFAULTS_KEY]) if roles_all.key? DEFAULTS_KEY
     @defaults = supermerge(@defaults, roles[DEFAULTS_KEY])     if roles.key? DEFAULTS_KEY
+    @defaults
   end
 
   def roles
@@ -121,18 +132,18 @@ class Foreplay::Engine
   def roles_all
     return @roles_all if @roles_all
 
-    @roles_all = YAML.load(File.read(CONFIG_FILE))
+    @roles_all = YAML.load(File.read(config_file))
 
     # This environment
     unless @roles_all.key? environment
-      terminate("No deployment configuration defined for #{environment} environment.\nCheck #{CONFIG_FILE}")
+      terminate("No deployment configuration defined for #{environment} environment.\nCheck #{config_file}")
     end
 
     @roles_all
   rescue Errno::ENOENT
-    terminate "Can't find configuration file #{CONFIG_FILE}.\nPlease run foreplay setup or create the file manually."
+    terminate "Can't find configuration file #{config_file}.\nPlease run foreplay setup or create the file manually."
   rescue Psych::SyntaxError
-    terminate "I don't understand the configuration file #{CONFIG_FILE}.\n"\
+    terminate "I don't understand the configuration file #{config_file}.\n"\
       'Please run foreplay setup or edit the file manually.'
   end
 end

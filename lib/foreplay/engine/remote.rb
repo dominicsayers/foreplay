@@ -1,5 +1,4 @@
 require 'net/ssh'
-require 'pp' # debug
 
 class Foreplay::Engine::Remote
   include Foreplay
@@ -22,31 +21,7 @@ class Foreplay::Engine::Remote
     puts "#{host}#{INDENT}Successfully connected to #{host} on port #{port}"
 
     session.shell do |sh|
-      steps.each do |step|
-        puts "#{host}#{INDENT}#{(step['commentary'] || step['command']).yellow}" unless step['silent'] == true
-
-        # Output from this step
-        output    = ''
-        previous  = '' # We don't need or want the final CRLF
-        commands  = Foreplay::Engine::Step.new(step, instructions).build
-
-        commands.each do |command|
-          process = sh.execute command
-
-          process.on_output do |_, o|
-            previous = o
-            output += previous
-          end
-
-          sh.wait!
-
-          if step['ignore_error'] == true || process.exit_status == 0
-            print output.gsub!(/^/, "#{host}#{INDENT * 2}") unless step['silent'] == true || output.blank?
-          else
-            terminate(output)
-          end
-        end
-      end
+      steps.each { |step| Foreplay::Engine::Remote::Step.new(sh, step, instructions).deploy }
     end
 
     session.close
@@ -55,27 +30,7 @@ class Foreplay::Engine::Remote
 
   # Deployment check: just say what we would have done
   def check
-    steps.each do |step|
-      puts "#{host}#{INDENT}#{(step['commentary'] || step['command']).yellow}" unless step['silent'] == true
-
-      if step.key? 'key'
-        i = instructions[step['key']]
-
-        if i.is_a? Hash
-          i.each { |k, v| puts "#{host}#{INDENT * 2}#{k}: #{v}" }
-        else
-          puts "#{host}#{INDENT * 2}#{i}"
-        end
-      else
-        commands = Foreplay::Engine::Step.new(step, instructions).build
-
-        commands.each do |command|
-          puts "#{host}#{INDENT * 2}#{command}" unless step['silent']
-        end
-      end
-    end
-
-    ''
+    Foreplay::Engine::Remote::Check.new(host, steps, instructions).perform
   end
 
   def user
@@ -97,35 +52,35 @@ class Foreplay::Engine::Remote
   def options
     return @options if @options
 
-    password    = instructions['password']
-    keyfile     = instructions['keyfile']
-    private_key = instructions['private_key']
-
-    keyfile.sub! '~', ENV['HOME'] || '/' unless keyfile.blank? # Remote shell won't expand this for us
-
-    # SSH authentication methods
     @options = { verbose: :warn, port: port }
+    password = instructions['password']
 
     if password.blank?
-      # If there's no password we must supply a private key
-      if private_key.blank?
-        message = 'No authentication methods supplied. '\
-                  'You must supply a private key, key file or password in the configuration file'
-        terminate(message) if keyfile.blank?
-        # Get the key from the key file
-        puts "#{INDENT}Using private key from #{keyfile}"
-        private_key = File.read keyfile
-      else
-        puts "#{INDENT}Using private key from the configuration file"
-      end
-
       @options[:key_data] = [private_key]
     else
-      # Use the password supplied
       @options[:password] = password
     end
 
     @options
+  end
+
+  def private_key
+    pk = instructions['private_key']
+    pk.blank? ? private_key_from_file : pk
+  end
+
+  def private_key_from_file
+    keyfile = instructions['keyfile']
+    keyfile.sub! '~', ENV['HOME'] || '/' unless keyfile.blank? # Remote shell won't expand this for us
+
+    terminate(
+      'No authentication methods supplied. '\
+      'You must supply a private key, key file or password in the configuration file'
+    ) if keyfile.blank?
+
+    # Get the key from the key file
+    puts "#{INDENT}Using private key from #{keyfile}"
+    File.read keyfile
   end
 
   def start_session(host, user, options)

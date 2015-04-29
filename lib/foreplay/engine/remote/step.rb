@@ -1,4 +1,5 @@
 class Foreplay::Engine::Remote::Step
+  include Foreplay
   attr_reader :shell, :step, :instructions
 
   def initialize(sh, st, i)

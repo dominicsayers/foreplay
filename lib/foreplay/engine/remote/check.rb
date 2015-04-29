@@ -1,4 +1,5 @@
 class Foreplay::Engine::Remote::Check
+  include Foreplay
   attr_reader :host, :steps, :instructions
 
   def initialize(h, s, i)

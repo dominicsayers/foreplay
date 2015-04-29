@@ -116,7 +116,7 @@ class Foreplay::Engine
     }
 
     # Add secret environment variables
-    secrets = Foreplay::Engine::Secrets.new(environment, roles_all['secrets']).fetch
+    secrets = Foreplay::Engine::Secrets.new(environment, roles_all['secrets']).fetch || {}
     @defaults['env'] = @defaults['env'].merge secrets
     @defaults['application'] = secrets
 

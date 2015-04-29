@@ -119,10 +119,10 @@ class Foreplay::Engine::Remote
         puts "#{INDENT}Using private key from the configuration file"
       end
 
-      @options['key_data'] = [private_key]
+      @options[:key_data] = [private_key]
     else
       # Use the password supplied
-      @options['password'] = password
+      @options[:password] = password
     end
 
     @options

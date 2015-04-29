@@ -19,7 +19,7 @@ class Foreplay::Engine::Secrets
   end
 
   def fetch_from(secret_location)
-    return {} unless secret_location['url']
+    return unless secret_location['url']
 
     headers = secret_location['headers'].map { |k, v| " -H \"#{k}: #{v}\"" }.join
     command = "curl -k -L#{headers} #{secret_location['url']}"
@@ -27,6 +27,6 @@ class Foreplay::Engine::Secrets
     secrets_all = YAML.load(`#{command}`)
     secrets_all[environment]
   rescue Psych::SyntaxError
-    {}
+    nil
   end
 end

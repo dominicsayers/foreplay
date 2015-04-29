@@ -10,23 +10,23 @@ describe Foreplay::Engine do
     end
 
     it 'should merge two simple hashes' do
-      expect(engine.supermerge({ a: 'x' }, b: 'y')).to eq(:a => 'x', :b => 'y')
+      expect(engine.supermerge({ a: 'x' }, b: 'y')).to eq(a: 'x', b: 'y')
     end
 
     it 'should merge two hashes both with arrays at the same key' do
-      expect(engine.supermerge({ a: ['x'] }, a: ['y'])).to eq(:a => %w(x y))
+      expect(engine.supermerge({ a: ['x'] }, a: ['y'])).to eq(a: %w(x y))
     end
 
     it 'should merge an array and a value at the same key' do
-      expect(engine.supermerge({ a: 'x' }, a: ['y'])).to eq(:a => %w(x y))
+      expect(engine.supermerge({ a: 'x' }, a: ['y'])).to eq(a: %w(x y))
     end
 
     it 'should replace a value at the same key' do
-      expect(engine.supermerge({ a: 'x' }, a: 'y')).to eq(:a => 'y')
+      expect(engine.supermerge({ a: 'x' }, a: 'y')).to eq(a: 'y')
     end
 
     it 'should merge two subhashes at the same key' do
-      expect(engine.supermerge({ a: { b: 'x' } }, a: { c: 'y' })).to eq(:a => { :b => 'x', :c => 'y' })
+      expect(engine.supermerge({ a: { b: 'x' } }, a: { c: 'y' })).to eq(a: { b: 'x', c: 'y' })
     end
   end
 end

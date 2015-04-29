@@ -1,8 +1,9 @@
 class Foreplay::Engine::Remote::Step
   include Foreplay
-  attr_reader :shell, :step, :instructions
+  attr_reader :host, :shell, :step, :instructions
 
-  def initialize(sh, st, i)
+  def initialize(h, sh, st, i)
+    @host = h
     @shell = sh
     @step = st
     @instructions = i
@@ -32,5 +33,7 @@ class Foreplay::Engine::Remote::Step
         terminate(output)
       end
     end
+
+    output
   end
 end

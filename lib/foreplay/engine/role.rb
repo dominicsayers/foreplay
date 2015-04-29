@@ -1,5 +1,3 @@
-require 'pp' # debug
-
 class Foreplay::Engine::Role
   attr_reader :environment, :mode, :instructions, :servers
   def initialize(e, m, i)

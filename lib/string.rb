@@ -14,4 +14,8 @@ class String
   def ansi_attributes(*args)
     "\e[#{args.join(';')}m#{self}\e[0m"
   end
+
+  def fake_erb
+    gsub(/(<%=\s+([^%]+)\s+%>)/) { |e| eval "_ = #{e.split[1]}" }
+  end
 end

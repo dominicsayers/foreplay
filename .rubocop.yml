@@ -30,6 +30,9 @@ FileName:
   Description: 'Use snake_case for source file names.'
   Enabled: true
 
+Eval:
+  Enabled: false
+
 # Work on these:
 
 LineLength:

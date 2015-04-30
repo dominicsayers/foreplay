@@ -16,6 +16,6 @@ class String
   end
 
   def fake_erb
-    gsub(/(<%=\s+([^%]+)\s+%>)/) { |e| eval "x = #{e.split[1]}" }
+    gsub(/(<%=\s+([^%]+)\s+%>)/) { |e| eval "_ = #{e.split[1]}" }
   end
 end

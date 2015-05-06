@@ -11,23 +11,29 @@ class Foreplay::Engine::Server
 
   def execute
     preposition = mode == :deploy ? 'to' : 'for'
+    puts "#{mode.capitalize}ing #{name.yellow} #{preposition} #{host.yellow} "\
+        "for the #{role.dup.yellow} role in the #{environment.dup.yellow} environment"
 
-    message = "#{mode.capitalize}ing #{name.yellow} #{preposition} #{host.yellow} "
-    message += "for the #{role.dup.yellow} role in the #{environment.dup.yellow} environment"
-    puts message
-
-    # Contents of .foreman file
-    instructions['foreman']['app']   = current_service
-    instructions['foreman']['port']  = current_port
-    instructions['foreman']['user']  = user
-    instructions['foreman']['log']   = "$HOME/#{path}/#{current_port}/log"
-
-    # Contents of .env file
-    instructions['env']['HOME']  = '$HOME'
-    instructions['env']['SHELL'] = '$SHELL'
-    instructions['env']['PATH']  = '$PATH:`which bundle`'
-
+    instructions['foreman'].merge! foreman
+    instructions['env'].merge! env
     Foreplay::Engine::Remote.new(server, steps, instructions).__send__ mode
+  end
+
+  def foreman
+    {
+      'app'   => current_service,
+      'port'  => current_port,
+      'user'  => user,
+      'log'   => "$HOME/#{path}/#{current_port}/log"
+    }
+  end
+
+  def env
+    {
+      'HOME'  => '$HOME',
+      'SHELL' => '$SHELL',
+      'PATH'  => '$PATH:`which bundle`'
+    }
   end
 
   def role

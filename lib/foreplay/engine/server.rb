@@ -53,7 +53,7 @@ class Foreplay::Engine::Server
 
   def host
     return @host if @host
-    @host, _ = server.split(':') # Parse host + port
+    @host, _p = server.split(':') # Parse host + port
     @host
   end
 

@@ -1,7 +1,6 @@
 require 'yaml'
 require 'string'
 require 'hash'
-require 'active_support/core_ext/object'
 
 class Foreplay::Engine
   include Foreplay

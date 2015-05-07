@@ -1,3 +1,5 @@
+require 'active_support/core_ext/object'
+
 class Hash
   # Returns a new hash with +hash+ and +other_hash+ merged recursively, including arrays.
   #

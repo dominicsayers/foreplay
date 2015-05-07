@@ -9,31 +9,22 @@ class Foreplay::Engine::Remote::Step
     @instructions = i
   end
 
-  def deploy
+  def execute
     puts "#{host}#{INDENT}#{(step['commentary'] || step['command']).yellow}" unless step['silent'] == true
+    output Foreplay::Engine::Step.new(step, instructions).build.map { |command| execute_command(command) }.join
+  end
 
-    # Output from this step
-    output    = ''
-    previous  = '' # We don't need or want the final CRLF
-    commands  = Foreplay::Engine::Step.new(step, instructions).build
+  def execute_command(command)
+    o = ''
+    process = shell.execute command
+    process.on_output { |_, po| o = po }
+    shell.wait!
+    terminate(o) unless step['ignore_error'] == true || process.exit_status == 0
+    o
+  end
 
-    commands.each do |command|
-      process = shell.execute command
-
-      process.on_output do |_, o|
-        previous = o
-        output += previous
-      end
-
-      shell.wait!
-
-      if step['ignore_error'] == true || process.exit_status == 0
-        print output.gsub!(/^/, "#{host}#{INDENT * 2}") unless step['silent'] == true || output.blank?
-      else
-        terminate(output)
-      end
-    end
-
-    output
+  def output(o)
+    puts o.gsub!(/^/, "#{host}#{INDENT * 2}") unless step['silent'] == true || o.blank?
+    o
   end
 end

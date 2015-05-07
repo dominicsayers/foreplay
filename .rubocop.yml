@@ -42,14 +42,7 @@ LineLength:
 
 MethodLength:
   Description: 'Avoid methods longer than 10 lines of code.'
-  Max: 27 # 85
-
-CyclomaticComplexity:
-  Description: 'Avoid complex methods.'
-  Max: 9
-
-PerceivedComplexity:
-  Max: 11 # 17
+  Max: 18 # 27 # 85
 
 AbcSize:
-  Max: 48 # 62
+  Max: 23 # 62

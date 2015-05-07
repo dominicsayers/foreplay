@@ -1,6 +1,6 @@
 require 'yaml'
 require 'string'
-require 'active_support/core_ext/object'
+require 'hash'
 
 class Foreplay::Engine
   include Foreplay
@@ -29,49 +29,19 @@ class Foreplay::Engine
     puts "#{mode.capitalize}ing #{environment.dup.yellow} environment, "\
          "#{explanatory_text(filters, 'role')}, #{explanatory_text(filters, 'server')}"
 
-    threads = []
-
-    roles.each do |role, additional_instructions|
-      next if role == DEFAULTS_KEY # 'defaults' is not a role
-      next if filters.key?('role') && filters['role'] != role
-
-      threads.concat Foreplay::Engine::Role.new(
+    actionable_roles.map do |role, instructions|
+      Foreplay::Engine::Role.new(
         environment,
         mode,
-        build_instructions(role, additional_instructions)
+        build_instructions(role, instructions)
       ).threads
-    end
-
-    threads.each(&:join)
+    end.flatten.each(&:join)
 
     puts mode == :deploy ? 'Finished deployment' : 'Deployment configuration check was successful'
   end
 
-  # Returns a new hash with +hash+ and +other_hash+ merged recursively, including arrays.
-  #
-  #   h1 = { x: { y: [4,5,6] }, z: [7,8,9] }
-  #   h2 = { x: { y: [7,8,9] }, z: 'xyz' }
-  #   h1.supermerge(h2)
-  #   #=> {:x=>{:y=>[4, 5, 6, 7, 8, 9]}, :z=>[7, 8, 9, "xyz"]}
-  def supermerge(hash, other_hash)
-    fail 'supermerge only works if you pass two hashes. '\
-      "You passed a #{hash.class} and a #{other_hash.class}." unless hash.is_a?(Hash) && other_hash.is_a?(Hash)
-
-    new_hash = hash.deep_dup
-
-    other_hash.each_pair do |k, v|
-      tv = new_hash[k]
-
-      if tv.is_a?(Hash) && v.is_a?(Hash)
-        new_hash[k] = supermerge(tv, v)
-      elsif tv.is_a?(Array) || v.is_a?(Array)
-        new_hash[k] = Array.wrap(tv) + Array.wrap(v)
-      else
-        new_hash[k] = v
-      end
-    end
-
-    new_hash
+  def actionable_roles
+    roles.select { |role, _i| role != DEFAULTS_KEY && role != filters['role'] }
   end
 
   private
@@ -81,7 +51,7 @@ class Foreplay::Engine
   end
 
   def build_instructions(role, additional_instructions)
-    instructions          = supermerge(defaults, additional_instructions)
+    instructions          = defaults.supermerge(additional_instructions)
     instructions['role']  = role
     required_keys         = %w(name environment role servers path repository)
 
@@ -115,14 +85,17 @@ class Foreplay::Engine
       'port'        =>  50_000
     }
 
-    # Add secret environment variables
-    secrets = Foreplay::Engine::Secrets.new(environment, roles_all['secrets']).fetch || {}
-    @defaults['env'] = @defaults['env'].merge secrets
+    @defaults['env'].merge! secrets
     @defaults['application'] = secrets
 
-    @defaults = supermerge(@defaults, roles_all[DEFAULTS_KEY]) if roles_all.key? DEFAULTS_KEY
-    @defaults = supermerge(@defaults, roles[DEFAULTS_KEY])     if roles.key? DEFAULTS_KEY
+    @defaults = @defaults.supermerge(roles_all[DEFAULTS_KEY]) if roles_all.key? DEFAULTS_KEY
+    @defaults = @defaults.supermerge(roles[DEFAULTS_KEY])     if roles.key? DEFAULTS_KEY
     @defaults
+  end
+
+  # Secret environment variables
+  def secrets
+    @secrets ||= Foreplay::Engine::Secrets.new(environment, roles_all['secrets']).fetch || {}
   end
 
   def roles

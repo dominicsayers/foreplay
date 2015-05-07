@@ -24,7 +24,7 @@ describe Foreplay::Launcher do
     allow(session).to receive(:shell).and_yield(shell)
     allow(shell).to receive(:execute).and_return(process)
     allow(shell).to receive(:wait!).and_return(false)
-    allow(process).to receive(:on_output).and_yield(process, "output message\n")
+    allow(process).to receive(:on_output).and_yield(process, "output message 1\noutput message 2\n")
     allow(process).to receive(:exit_status).and_return(0)
   end
 

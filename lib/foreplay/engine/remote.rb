@@ -22,7 +22,7 @@ class Foreplay::Engine::Remote
     puts "#{host}#{INDENT}Successfully connected to #{host} on port #{port}"
 
     session.shell do |sh|
-      steps.each { |step| output += Foreplay::Engine::Remote::Step.new(host, sh, step, instructions).deploy }
+      steps.each { |step| output += Foreplay::Engine::Remote::Step.new(host, sh, step, instructions).execute }
     end
 
     session.close

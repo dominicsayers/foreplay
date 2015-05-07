@@ -1,6 +1,7 @@
 require 'yaml'
 require 'string'
 require 'hash'
+require 'pp' # debug
 
 class Foreplay::Engine
   include Foreplay
@@ -51,9 +52,10 @@ class Foreplay::Engine
   end
 
   def build_instructions(role, additional_instructions)
-    instructions          = defaults.supermerge(additional_instructions)
-    instructions['role']  = role
-    required_keys         = %w(name environment role servers path repository)
+    instructions            = defaults.supermerge(additional_instructions)
+    instructions['role']    = role
+    instructions['verbose'] = verbose
+    required_keys           = %w(name environment role servers path repository)
 
     required_keys.each do |key|
       next if instructions.key? key
@@ -87,7 +89,7 @@ class Foreplay::Engine
 
     @defaults['env'].merge! secrets
     @defaults['application'] = secrets
-
+pp @defaults # debug
     @defaults = @defaults.supermerge(roles_all[DEFAULTS_KEY]) if roles_all.key? DEFAULTS_KEY
     @defaults = @defaults.supermerge(roles[DEFAULTS_KEY])     if roles.key? DEFAULTS_KEY
     @defaults
@@ -96,6 +98,10 @@ class Foreplay::Engine
   # Secret environment variables
   def secrets
     @secrets ||= Foreplay::Engine::Secrets.new(environment, roles_all['secrets']).fetch || {}
+  end
+
+  def verbose
+    @verbose ||= filters.key?('verbose')
   end
 
   def roles

@@ -46,9 +46,9 @@ module Foreplay::Engine::Port
     current_port_string = Foreplay::Engine::Remote.new(server, port_steps, instructions).__send__(mode).strip!
 
     if current_port_string.blank?
-      puts "#{host}#{INDENT}No instance is currently deployed"
+      log 'No instance is currently deployed', host: host
     else
-      puts "#{host}#{INDENT}Current instance is using port #{current_port_string}"
+      log "Current instance is using port #{current_port_string}", host: host
     end
 
     cp      = current_port_string.to_i

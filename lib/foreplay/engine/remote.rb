@@ -14,12 +14,12 @@ class Foreplay::Engine::Remote
   def deploy
     output = ''
 
-    puts "#{host}#{INDENT}Connecting to #{host} on port #{port}"
+    log "Connecting to #{host} on port #{port}", host: host
 
     # SSH connection
     session = start_session(host, user, options)
 
-    puts "#{host}#{INDENT}Successfully connected to #{host} on port #{port}"
+    log "Successfully connected to #{host} on port #{port}", host: host
 
     session.shell do |sh|
       steps.each { |step| output += Foreplay::Engine::Remote::Step.new(host, sh, step, instructions).execute }
@@ -80,13 +80,13 @@ class Foreplay::Engine::Remote
     ) if keyfile.blank?
 
     # Get the key from the key file
-    puts "#{INDENT}Using private key from #{keyfile}"
+    log "Using private key from #{keyfile}"
     File.read keyfile
   end
 
   def start_session(host, user, options)
     Net::SSH.start(host, user, options)
   rescue SocketError => e
-    terminate "#{host}#{INDENT}There was a problem starting an ssh session on #{host}:\n#{e.message}"
+    terminate "There was a problem starting an ssh session on #{host}:\n#{e.message}"
   end
 end

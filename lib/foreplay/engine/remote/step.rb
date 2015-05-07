@@ -10,21 +10,26 @@ class Foreplay::Engine::Remote::Step
   end
 
   def execute
-    puts "#{host}#{INDENT}#{(step['commentary'] || step['command']).yellow}" unless step['silent'] == true
-    output Foreplay::Engine::Step.new(step, instructions).build.map { |command| execute_command(command) }.join
+    s = Foreplay::Engine::Step.new(host, step, instructions)
+    s.announce
+    output s.commands.map { |command| execute_command(command) }.join
   end
 
   def execute_command(command)
     o = ''
     process = shell.execute command
-    process.on_output { |_, po| o = po }
+    process.on_output { |_, po| o += po }
     shell.wait!
     terminate(o) unless step['ignore_error'] == true || process.exit_status == 0
     o
   end
 
+  def silent
+    @silent ||= instructions['verbose'] ? false : step['silent']
+  end
+
   def output(o)
-    puts o.gsub!(/^/, "#{host}#{INDENT * 2}") unless step['silent'] == true || o.blank?
+    log o, host: host, silent: silent, indent: 1
     o
   end
 end

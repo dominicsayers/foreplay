@@ -1,24 +1,32 @@
 class Foreplay::Engine::Step
-  attr_reader :step, :instructions
+  include Foreplay
+  attr_reader :host, :step, :instructions
 
-  def initialize(s, i)
+  def initialize(h, s, i)
+    @host = h
     @step = s
     @instructions = i
-  end
-
-  def build
-    # Each step can be (1) a command or (2) a series of values to add to a file
-    if step.key?('key')
-      instructions.key?(step['key']) ? commands : []
-    else
-      # ...or just execute the command specified
-      [step['command']]
-    end
   end
 
   def commands
     return @commands if @commands
 
+    # Each step can be (1) a command or (2) a series of values to add to a file
+    if step.key?('key')
+      if instructions.key?(step['key'])
+        build_commands
+      else
+        @commands = []
+      end
+    else
+      # ...or just execute the command specified
+      @commands = [command]
+    end
+
+    @commands
+  end
+
+  def build_commands
     step['silent'] = true
 
     if header?
@@ -33,8 +41,6 @@ class Foreplay::Engine::Step
     else
       build_commands_from_string
     end
-
-    @commands
   end
 
   def build_commands_from_hash
@@ -54,6 +60,10 @@ class Foreplay::Engine::Step
       @redirect = true
       '>'
     end
+  end
+
+  def command
+    @command ||= step['command']
   end
 
   def filename
@@ -94,5 +104,14 @@ class Foreplay::Engine::Step
 
   def header?
     header.present?
+  end
+
+  def silent
+    @silent ||= step['silent']
+  end
+
+  def announce
+    log "#{(step['commentary'] || command).yellow}", host: host, silent: silent
+    log command.cyan, host: host, silent: silent if instructions['verbose'] && step['commentary'] && command
   end
 end

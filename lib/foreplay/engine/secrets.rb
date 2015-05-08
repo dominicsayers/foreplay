@@ -1,5 +1,3 @@
-require 'pp' # debug
-
 class Foreplay::Engine::Secrets
   attr_reader :environment, :secret_locations
 
@@ -17,7 +15,6 @@ class Foreplay::Engine::Secrets
       secrets.merge! fetch_from(secret_location) || {}
     end
 
-pp secrets # debug
     secrets
   end
 
@@ -27,7 +24,6 @@ pp secrets # debug
     headers       = secret_location['headers']
     header_string = headers.map { |k, v| " -H \"#{k}: #{v}\"" }.join if headers.is_a? Hash
     command       = "curl -k -L#{header_string} #{url}".fake_erb
-puts command.magenta # debug
     secrets_all   = YAML.load(`#{command}`)
     secrets       = secrets_all[environment]
 

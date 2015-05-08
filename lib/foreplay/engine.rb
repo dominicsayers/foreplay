@@ -1,7 +1,6 @@
 require 'yaml'
 require 'string'
 require 'hash'
-require 'pp' # debug
 
 class Foreplay::Engine
   include Foreplay
@@ -89,7 +88,6 @@ class Foreplay::Engine
 
     @defaults['env'].merge! secrets
     @defaults['application'] = secrets
-pp @defaults # debug
     @defaults = @defaults.supermerge(roles_all[DEFAULTS_KEY]) if roles_all.key? DEFAULTS_KEY
     @defaults = @defaults.supermerge(roles[DEFAULTS_KEY])     if roles.key? DEFAULTS_KEY
     @defaults

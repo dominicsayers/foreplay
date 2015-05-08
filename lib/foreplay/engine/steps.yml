@@ -44,17 +44,17 @@
   path:         'config/'
 - command:      'if [ -d ../cache/vendor/bundle ] ; then rsync -aW --no-compress --delete --info=STATS1 ../cache/vendor/bundle/ vendor/bundle ; else echo No bundle to restore ; fi'
   commentary:   'Attempting to restore bundle from cache'
+- command:      'gem install bundler -v "> 1.8"'
+  commentary:   'Updating the bundler version'
 - command:      'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle'
   commentary:   'Setting the current version of bundle to be the default'
-- command:      "gem install bundler -v '> 1.8'"
-  commentary:   'Updating the bundler version'
-- command:      'bundle install --deployment --clean --jobs 2 --without development test'
+- command:      '/usr/bin/bundle install --deployment --clean --jobs 2 --without development test'
   commentary:   'Using bundler to install the required gems in deployment mode'
 - command:      'mkdir -p ../cache/vendor && rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle'
   commentary:   'Caching bundle'
-- command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets" ; else RAILS_ENV=<%= environment %> bundle exec foreman run rake assets:precompile ; fi'
+- command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets" ; else RAILS_ENV=<%= environment %> /usr/bin/bundle exec foreman run rake assets:precompile ; fi'
   commentary:   'Precompiling assets unless they were supplied'
-- command:      'sudo bundle exec foreman export upstart /etc/init'
+- command:      'sudo /usr/bin/bundle exec foreman export upstart /etc/init'
   commentary:   "Converting <%= current_service %> to an upstart service"
 - command:      "sudo start <%= current_service %> || sudo restart <%= current_service %>"
   commentary:   'Starting the service'

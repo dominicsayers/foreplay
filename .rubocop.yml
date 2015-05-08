@@ -42,7 +42,7 @@ LineLength:
 
 MethodLength:
   Description: 'Avoid methods longer than 10 lines of code.'
-  Max: 18 # 27 # 85
+  Max: 14 # 18 # 27 # 85
 
 AbcSize:
-  Max: 23 # 62
+  Max: 21 # 23 # 62

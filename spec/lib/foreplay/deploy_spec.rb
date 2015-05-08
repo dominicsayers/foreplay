@@ -150,8 +150,6 @@ describe Foreplay::Launcher do
       'echo "  host: TODO Put here the database host name" >> config/database.yml',
       'echo "  username: TODO Put here the database user" >> config/database.yml',
       'echo "  password: TODO Put here the database user\'s password" >> config/database.yml',
-      'if [ -d ../cache/vendor/bundle/bundle ] ; then rm -rf ../cache/vendor/bundle/bundle'\
-      ' ; else echo No evidence of legacy copy bug ; fi',
       'if [ -d ../cache/vendor/bundle ] ; then '\
       'rsync -aW --no-compress --delete --info=STATS1 ../cache/vendor/bundle/ vendor/bundle'\
       ' ; else echo No bundle to restore ; fi',

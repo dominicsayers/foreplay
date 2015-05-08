@@ -10,7 +10,7 @@ class Foreplay::Engine::Remote::Check
 
   def perform
     steps.each do |step|
-      puts "#{host}#{INDENT}#{(step['commentary'] || step['command']).yellow}" unless step['silent'] == true
+      log "#{(step['commentary'] || step['command']).yellow}", host: host, silent: step['silent']
 
       if step.key? 'key'
         list_file_contents step['key']
@@ -26,17 +26,17 @@ class Foreplay::Engine::Remote::Check
     i = instructions[id]
 
     if i.is_a? Hash
-      i.each { |k, v| puts "#{host}#{INDENT * 2}#{k}: #{v}" }
+      i.each { |k, v| log "#{k}: #{v}", host: host, indent: 1 }
     else
-      puts "#{host}#{INDENT * 2}#{i}"
+      log i, host: host, indent: 1
     end
   end
 
   def list_commands(step)
-    commands = Foreplay::Engine::Step.new(step, instructions).build
+    commands = Foreplay::Engine::Step.new(host, step, instructions).commands
 
     commands.each do |command|
-      puts "#{host}#{INDENT * 2}#{command}" unless step['silent']
+      log command, host: host, silent: step['silent']
     end
   end
 end

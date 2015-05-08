@@ -135,6 +135,7 @@ describe Foreplay::Launcher do
       'git clone -b master git@github.com:Xenapto/foreplay.git 50000',
       'rvm rvmrc trust 50000',
       'rvm rvmrc warning ignore 50000',
+      'gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys D39DC0E3',
       'cd 50000 && mkdir -p tmp doc log config',
       'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
       'echo "RAILS_ENV=production" > .env',
@@ -150,18 +151,17 @@ describe Foreplay::Launcher do
       'echo "  host: TODO Put here the database host name" >> config/database.yml',
       'echo "  username: TODO Put here the database user" >> config/database.yml',
       'echo "  password: TODO Put here the database user\'s password" >> config/database.yml',
-      'if [ -d ../cache/vendor/bundle/bundle ] ; then rm -rf ../cache/vendor/bundle/bundle'\
-      ' ; else echo No evidence of legacy copy bug ; fi',
       'if [ -d ../cache/vendor/bundle ] ; then '\
       'rsync -aW --no-compress --delete --info=STATS1 ../cache/vendor/bundle/ vendor/bundle'\
       ' ; else echo No bundle to restore ; fi',
+      'gem install bundler -v "> 1.8"',
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
-      'bundle install --deployment --clean --jobs 2 --without development test',
+      '/usr/bin/bundle install --deployment --clean --jobs 2 --without development test',
       'mkdir -p ../cache/vendor && '\
       'rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
-      ' ; else RAILS_ENV=production bundle exec foreman run rake assets:precompile ; fi',
-      'sudo bundle exec foreman export upstart /etc/init',
+      ' ; else RAILS_ENV=production /usr/bin/bundle exec foreman run rake assets:precompile ; fi',
+      'sudo /usr/bin/bundle exec foreman export upstart /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',
       'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
       'echo 50000 > $HOME/.foreplay/foreplay/current_port',

@@ -1,5 +1,7 @@
 module Foreplay
-  INDENT = "\t"
+  def log(message, options = {})
+    Foreplay::Engine::Logger.new(message, options)
+  end
 
   def terminate(message)
     fail message

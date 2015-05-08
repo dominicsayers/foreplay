@@ -40,19 +40,30 @@ module Foreplay::Engine::Port
     ]
   end
 
+  def current_port_remote
+    return @current_port_remote if @current_port_remote
+
+    @current_port_remote = Foreplay::Engine::Remote
+                           .new(server, port_steps, instructions)
+                           .__send__(mode)
+                           .strip!
+                           .to_i
+
+    message = if @current_port_remote.blank?
+                'No instance is currently deployed'
+              else
+                "Current instance is using port #{@current_port_remote}"
+              end
+
+    log message, host: host
+    @current_port_remote
+  end
+
   def port_details
     return @port_details if @port_details
 
-    current_port_string = Foreplay::Engine::Remote.new(server, port_steps, instructions).__send__(mode).strip!
-
-    if current_port_string.blank?
-      log 'No instance is currently deployed', host: host
-    else
-      log "Current instance is using port #{current_port_string}", host: host
-    end
-
-    cp      = current_port_string.to_i
-    port    = instructions['port']
+    cp      = current_port_remote
+    port    = instructions['port'].to_i
     ports   = [port + 1000, port]
     cp, fp  = cp == port ? ports : ports.reverse
 

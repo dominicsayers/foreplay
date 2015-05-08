@@ -25,26 +25,27 @@ class Foreplay::Engine
   end
 
   def execute
-    # Explain what we're going to do
     puts "#{mode.capitalize}ing #{environment.dup.yellow} environment, "\
          "#{explanatory_text(filters, 'role')}, #{explanatory_text(filters, 'server')}"
 
-    actionable_roles.map do |role, instructions|
-      Foreplay::Engine::Role.new(
-        environment,
-        mode,
-        build_instructions(role, instructions)
-      ).threads
-    end.flatten.each(&:join)
+    actionable_roles.map { |role, instructions| threads(role, instructions) }.flatten.each(&:join)
 
     puts mode == :deploy ? 'Finished deployment' : 'Deployment configuration check was successful'
   end
+
+  private
 
   def actionable_roles
     roles.select { |role, _i| role != DEFAULTS_KEY && role != filters['role'] }
   end
 
-  private
+  def threads(role, instructions)
+    Foreplay::Engine::Role.new(
+      environment,
+      mode,
+      build_instructions(role, instructions)
+    ).threads
+  end
 
   def explanatory_text(hsh, key)
     hsh.key?(key) ? "#{hsh[key].dup.yellow} #{key}" : "all #{key}s"

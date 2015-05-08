@@ -14,6 +14,8 @@
   commentary:   'If you have a .rvmrc file there may be a delay now while we install a new ruby'
 - command:      'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi'
   commentary:   'If you have a .ruby-version file there may be a delay now while we install a new ruby'
+- command:      'rvm info'
+  commentary:   'Showing RVM environment'
 - key:          'env'
   delimiter:    '='
   prefix:       '.'

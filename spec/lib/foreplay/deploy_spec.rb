@@ -137,6 +137,7 @@ describe Foreplay::Launcher do
       'rvm rvmrc warning ignore 50000',
       'gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys D39DC0E3',
       'cd 50000 && mkdir -p tmp doc log config',
+      'rvm info',
       'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
       'echo "RAILS_ENV=production" > .env',
       'echo "concurrency: web=1,worker=0,scheduler=0" > .foreman',

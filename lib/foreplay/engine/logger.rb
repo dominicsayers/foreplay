@@ -16,7 +16,10 @@ class Foreplay::Engine::Logger
   end
 
   def formatted_message
-    @formatted_message ||= header + message.gsub(/\s+\z/, '').gsub(/(\r\n*)/, "\\1#{margin}")
+    @formatted_message ||= header + message
+                                    .gsub(/\A\s*/, '')
+                                    .gsub(/\s+\z/, '')
+                                    .gsub(/(\r\n*)/, "\\1#{margin}")
   end
 
   def header

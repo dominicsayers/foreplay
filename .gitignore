@@ -1,4 +1,6 @@
 .ruby-gemset
+._*
+.DS_Store
 
 *.TMP
 *.rbc

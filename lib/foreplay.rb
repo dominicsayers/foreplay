@@ -1,13 +1,16 @@
 require 'foreplay/version'
-require 'foreplay/foreplay'
-require 'foreplay/launcher'
 require 'foreplay/engine'
-require 'foreplay/engine/remote'
-require 'foreplay/engine/remote/check'
-require 'foreplay/engine/remote/step'
-require 'foreplay/engine/logger'
-require 'foreplay/engine/port'
-require 'foreplay/engine/role'
-require 'foreplay/engine/secrets'
-require 'foreplay/engine/server'
-require 'foreplay/engine/step'
+require 'foreplay/launcher'
+
+module Foreplay
+  DEFAULT_PORT = 50_000
+  PORT_GAP = 1_000
+
+  def log(message, options = {})
+    Foreplay::Engine::Logger.new(message, options)
+  end
+
+  def terminate(message)
+    fail message
+  end
+end

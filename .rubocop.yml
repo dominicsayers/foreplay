@@ -12,7 +12,7 @@ DotPosition:
 
 ClassAndModuleChildren:
   Description: 'Checks style of children classes and modules.'
-  EnforcedStyle: compact
+  EnforcedStyle: nested
   Enabled: true
 
 Documentation:

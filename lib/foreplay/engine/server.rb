@@ -15,6 +15,7 @@ module Foreplay
         execute_announce
         foreman
         env
+
         Foreplay::Engine::Remote.new(server, steps, instructions).__send__ mode
       end
 
@@ -25,6 +26,8 @@ module Foreplay
       end
 
       def foreman
+        instructions['foreman'] = {} unless instructions.key? 'foreman'
+
         instructions['foreman'].merge!(
           'app'   => current_service,
           'port'  => current_port,
@@ -34,10 +37,14 @@ module Foreplay
       end
 
       def env
+        instructions['env'] = {} unless instructions.key? 'env'
+
         instructions['env'].merge!(
-          'HOME'  => '$HOME',
-          'SHELL' => '$SHELL',
-          'PATH'  => '$PATH:`which bundle`'
+          'HOME'      => '$HOME',
+          'SHELL'     => '$SHELL',
+          'PATH'      => '$PATH:`which bundle`',
+          'GEM_HOME'  => '$HOME/.rvm/gems/`rvm tools identifier`',
+          'RAILS_ENV' => environment
         )
       end
 

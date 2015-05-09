@@ -36,7 +36,7 @@ module Foreplay
     private
 
     def actionable_roles
-      roles.select { |role, _i| role != DEFAULTS_KEY && role != filters['role'] }
+      roles.select { |role, _i| role != DEFAULTS_KEY && (filters.key?('role') ? role == filters['role'] : true) }
     end
 
     def threads(role, instructions)

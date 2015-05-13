@@ -12,13 +12,12 @@ module Foreplay
         # Establish defaults
         # First the default defaults
         @defaults = {
-          'name'        =>  File.basename(Dir.getwd),
-          'environment' =>  environment,
-          'env'         =>  { 'RAILS_ENV' => environment },
-          'port'        =>  DEFAULT_PORT
+          'name'            =>  File.basename(Dir.getwd),
+          'environment'     =>  environment,
+          'port'            =>  DEFAULT_PORT
         }
 
-        @defaults['env'].merge! secrets
+        @defaults['env'] = secrets
         @defaults['application'] = secrets
         @defaults = @defaults.supermerge(roles_all[DEFAULTS_KEY]) if roles_all.key? DEFAULTS_KEY
         @defaults = @defaults.supermerge(roles[DEFAULTS_KEY])     if roles.key? DEFAULTS_KEY
@@ -27,7 +26,7 @@ module Foreplay
 
       # Secret environment variables
       def secrets
-        @secrets ||= Foreplay::Engine::Secrets.new(environment, roles_all['secrets']).fetch || {}
+        @secrets ||= (Foreplay::Engine::Secrets.new(environment, roles_all['secrets']).fetch || {})
       end
 
       def roles

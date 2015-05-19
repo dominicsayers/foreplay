@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'hash'
+require 'foreplay'
 
 describe Hash do
   context '#supermerge' do

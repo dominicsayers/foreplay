@@ -1,6 +1,4 @@
 require 'yaml'
-require 'string'
-require 'hash'
 
 require 'foreplay/engine/defaults'
 require 'foreplay/engine/logger'

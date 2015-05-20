@@ -1,4 +1,3 @@
-require 'active_support/core_ext'
 require 'foreplay/version'
 require 'foreplay/engine'
 require 'foreplay/launcher'
@@ -16,6 +15,8 @@ module Foreplay
   end
 end
 
+require 'active_support'
+require 'active_support/core_ext'
 require 'active_support/core_ext/object'
 
 class Hash

@@ -14,6 +14,8 @@ module Foreplay
         @server = s
         @steps = st
         @instructions = i
+
+        @options = nil
       end
 
       def deploy

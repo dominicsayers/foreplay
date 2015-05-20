@@ -17,6 +17,9 @@ module Foreplay
     def initialize(e, f)
       @environment  = e
       @filters      = f
+
+      @defaults = nil
+      @roles_all = nil
     end
 
     [:deploy, :check].each { |m| define_method(m) { execute m } }

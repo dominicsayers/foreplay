@@ -8,6 +8,9 @@ module Foreplay
         @host = h
         @step = s
         @instructions = i
+
+        @commands = nil
+        @redirect = nil
       end
 
       def commands

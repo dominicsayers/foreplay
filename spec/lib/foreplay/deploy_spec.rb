@@ -171,11 +171,11 @@ describe Foreplay::Launcher do
       'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
       'echo 50000 > $HOME/.foreplay/foreplay/current_port',
       'sleep 60',
-      'sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 50000',
-      'sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 51000',
-      'sudo iptables-save > /etc/iptables/rules.v4',
-      'sudo iptables-save > /etc/iptables.up.rules',
-      'sudo iptables-save -c | egrep REDIRECT --color=never',
+      #- 'sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 50000',
+      #- 'sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 51000',
+      #- 'sudo iptables-save > /etc/iptables/rules.v4',
+      #- 'sudo iptables-save > /etc/iptables.up.rules',
+      #- 'sudo iptables-save -c | egrep REDIRECT --color=never',
       'sudo stop foreplay-51000 || echo \'No previous instance running\''
     ].each do |command|
       expect(shell).to receive(:execute).with(command).and_return(process)

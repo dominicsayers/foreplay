@@ -1,3 +1,5 @@
+require 'foreplay/engine/secrets/location'
+
 module Foreplay
   class Engine
     class Secrets
@@ -12,26 +14,12 @@ module Foreplay
         return unless secret_locations
 
         secrets = {}
-
-        secret_locations.each do |secret_location|
-          secrets.merge! fetch_from(secret_location) || {}
-        end
-
+        secret_locations.each { |secret_location| secrets.merge! location_secrets(secret_location) }
         secrets
       end
 
-      def fetch_from(secret_location)
-        url = secret_location['url'] || return
-
-        headers       = secret_location['headers']
-        header_string = headers.map { |k, v| " -H \"#{k}: #{v}\"" }.join if headers.is_a? Hash
-        command       = "curl -k -L#{header_string} #{url}".fake_erb
-        secrets_all   = YAML.load(`#{command}`)
-        secrets       = secrets_all[environment]
-
-        secrets if secrets.is_a? Hash
-      rescue Psych::SyntaxError
-        nil
+      def location_secrets(secret_location)
+        Location.new(secret_location, environment).secrets
       end
     end
   end

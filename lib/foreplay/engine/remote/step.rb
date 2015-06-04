@@ -27,12 +27,12 @@ module Foreplay
           o
         end
 
-        def silent
-          @silent ||= instructions['verbose'] ? false : step['silent']
+        def silent?
+          @silent ||= instructions.key?('verbose') ? false : step['silent']
         end
 
         def output(o)
-          log o, host: host, silent: silent, indent: 1
+          log o, host: host, silent: silent?, indent: 1
           o
         end
       end

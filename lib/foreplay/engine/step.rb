@@ -32,7 +32,7 @@ module Foreplay
       end
 
       def build_commands
-        step['silent'] = true
+        step['silent'] = !instructions.key?('verbose')
 
         if header?
           @commands  = ["echo \"#{header}\" > #{filename}"]
@@ -111,13 +111,13 @@ module Foreplay
         header.present?
       end
 
-      def silent
+      def silent?
         @silent ||= step['silent']
       end
 
       def announce
-        log "#{(step['commentary'] || command).yellow}", host: host, silent: silent
-        log command.cyan, host: host, silent: silent if instructions['verbose'] && step['commentary'] && command
+        log "#{(step['commentary'] || command).yellow}", host: host, silent: silent?
+        log command.cyan, host: host, silent: silent? if instructions['verbose'] && step['commentary'] && command
       end
     end
   end

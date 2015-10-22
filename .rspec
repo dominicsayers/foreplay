@@ -1,0 +1,5 @@
+--color
+--require spec_helper
+--profile
+--format RspecJunitFormatter --out <%= ENV.fetch('CIRCLE_TEST_REPORTS', 'tmp') %>/rspec/rspec.xml
+--format documentation

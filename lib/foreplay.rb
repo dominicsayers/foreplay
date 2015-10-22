@@ -83,6 +83,6 @@ require 'yaml'
 module YAML
   # Escape string so it's safe for a YAML value
   def self.escape(string)
-    /^---\n__: ([^\n]*)$/.match(dump('__' => string))[1]
+    /^---\n__: ([^\n]*)$/.match(Psych.dump('__' => string))[1]
   end
 end

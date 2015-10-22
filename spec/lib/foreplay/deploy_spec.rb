@@ -82,8 +82,9 @@ describe Foreplay::Launcher do
     `rm -f config/foreplay.yml`
     `#{command}`
 
+    # Exact error message text is Ruby version dependent
     expect { Foreplay::Launcher.start([:deploy, 'production', '']) }
-      .to raise_error(Errno::ENOENT, %r{.*No such file or directory @ rb_sysopen - /home/fred/no-such-file.*})
+      .to raise_error(Errno::ENOENT, %r{.*No such file or directory.+/home/fred/no-such-file.*})
   end
 
   it 'complains if a mandatory key is missing from the config file' do
@@ -152,7 +153,7 @@ describe Foreplay::Launcher do
       'echo "---" > config/application.yml',
       'echo "production:" >> config/application.yml',
       'echo "  BIG_SECRET: \'123\'" >> config/application.yml',
-      'echo "  MOUSTACHE: \\"{{moustache}}\\"" >> config/application.yml',
+      'echo "  MOUSTACHE: ! \'{{moustache}}\'" >> config/application.yml',
       'echo "---" > .foreman',
       'echo "concurrency: web=1,worker=0,scheduler=0" >> .foreman',
       'echo "app: foreplay-50000" >> .foreman',

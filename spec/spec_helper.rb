@@ -4,6 +4,7 @@ CodeClimate::TestReporter.start
 
 unless ENV['NO_SIMPLECOV']
   require 'simplecov'
+  require 'coveralls'
 
   if ENV['CIRCLE_ARTIFACTS']
     dir = File.join('..', '..', '..', ENV['CIRCLE_ARTIFACTS'], 'coverage')

@@ -1,6 +1,4 @@
-require 'spec_helper'
 require 'net/ssh/shell'
-require 'foreplay'
 
 describe Foreplay::Launcher do
   let(:session) { double(Net::SSH::Connection::Session) }
@@ -123,6 +121,11 @@ describe Foreplay::Launcher do
   end
 
   it 'deploys to the environment' do
+    secret_data = { 'BIG_SECRET' => '123', 'MOUSTACHE' => '{{moustache}}' }
+    secrets = double(Foreplay::Engine::Secrets)
+    allow(secrets).to receive(:fetch).and_return(secret_data)
+    allow(Foreplay::Engine::Secrets).to receive(:new).and_return(secrets)
+
     expect(Net::SSH)
       .to(receive(:start))
       .with(/web[12].example.com/, 'fred',  verbose: :warn, port: 22, password: 'trollope')
@@ -139,16 +142,24 @@ describe Foreplay::Launcher do
       'cd 50000 && mkdir -p tmp doc log config',
       'rvm rvmrc load && rvm info',
       'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
-      'echo "HOME=$HOME" > .env',
+      'echo "BIG_SECRET=123" > .env',
+      'echo "MOUSTACHE={{moustache}}" >> .env',
+      'echo "HOME=$HOME" >> .env',
       'echo "SHELL=$SHELL" >> .env',
       'echo "PATH=$PATH:`which bundle`" >> .env',
       'echo "GEM_HOME=$HOME/.rvm/gems/`rvm tools identifier`" >> .env',
       'echo "RAILS_ENV=production" >> .env',
-      'echo "concurrency: web=1,worker=0,scheduler=0" > .foreman',
+      'echo "---" > config/application.yml',
+      'echo "production:" >> config/application.yml',
+      'echo "  BIG_SECRET: \'123\'" >> config/application.yml',
+      'echo "  MOUSTACHE: \\"{{moustache}}\\"" >> config/application.yml',
+      'echo "---" > .foreman',
+      'echo "concurrency: web=1,worker=0,scheduler=0" >> .foreman',
       'echo "app: foreplay-50000" >> .foreman',
       'echo "port: 50000" >> .foreman',
       'echo "user: fred" >> .foreman',
-      'echo "production:" > config/database.yml',
+      'echo "---" > config/database.yml',
+      'echo "production:" >> config/database.yml',
       'echo "  adapter: postgresql" >> config/database.yml',
       'echo "  encoding: utf8" >> config/database.yml',
       'echo "  database: TODO Put the database name here" >> config/database.yml',
@@ -171,11 +182,6 @@ describe Foreplay::Launcher do
       'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
       'echo 50000 > $HOME/.foreplay/foreplay/current_port',
       'sleep 60',
-      #- 'sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 50000',
-      #- 'sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 51000',
-      #- 'sudo iptables-save > /etc/iptables/rules.v4',
-      #- 'sudo iptables-save > /etc/iptables.up.rules',
-      #- 'sudo iptables-save -c | egrep REDIRECT --color=never',
       'sudo stop foreplay-51000 || echo \'No previous instance running\''
     ].each do |command|
       expect(shell).to receive(:execute).with(command).and_return(process)

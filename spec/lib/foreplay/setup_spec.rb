@@ -1,6 +1,3 @@
-require 'spec_helper'
-require 'foreplay/setup'
-
 describe Foreplay::Setup do
   before :each do
     `rm -f config/foreplay.yml`

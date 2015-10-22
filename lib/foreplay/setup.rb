@@ -27,7 +27,7 @@ module Foreplay
     end
 
     def config
-      template('setup/foreplay.yml', 'config/foreplay.yml')
+      template('setup/foreplay.template.yml', 'config/foreplay.yml')
     end
   end
 end

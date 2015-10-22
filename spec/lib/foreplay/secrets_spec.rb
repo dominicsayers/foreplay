@@ -1,6 +1,3 @@
-require 'spec_helper'
-require 'foreplay'
-
 describe Foreplay::Engine::Secrets do
   context '#fetch' do
     it 'returns nil if there is no secret location' do

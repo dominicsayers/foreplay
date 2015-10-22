@@ -9,7 +9,6 @@ Gemfile.lock
 *.sassc
 .sass-cache
 capybara-*.html
-.rspec
 .env
 /.bundle
 /vendor/bundle

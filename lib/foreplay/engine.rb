@@ -1,12 +1,3 @@
-#- require 'foreplay/engine/defaults'
-#- require 'foreplay/engine/logger'
-#- require 'foreplay/engine/port'
-#- require 'foreplay/engine/remote'
-#- require 'foreplay/engine/role'
-#- require 'foreplay/engine/secrets'
-#- require 'foreplay/engine/server'
-#- require 'foreplay/engine/step'
-
 module Foreplay
   class Engine
     autoload :Defaults, 'foreplay/engine/defaults'

@@ -1,4 +1,4 @@
-# CodeClimate code coverage reporting (not used at the moment)
+# CodeClimate code coverage reporting
 require 'codeclimate-test-reporter'
 CodeClimate::TestReporter.start
 

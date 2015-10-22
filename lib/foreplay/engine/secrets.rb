@@ -1,5 +1,3 @@
-#- require 'foreplay/engine/secrets/location'
-
 module Foreplay
   class Engine
     class Secrets

@@ -78,6 +78,8 @@ class String
   end
 end
 
+require 'yaml'
+
 module YAML
   # Escape string so it's safe for a YAML value
   def self.escape(string)

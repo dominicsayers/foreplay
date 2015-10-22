@@ -1,8 +1,10 @@
-require 'foreplay/engine/secrets/location'
+#- require 'foreplay/engine/secrets/location'
 
 module Foreplay
   class Engine
     class Secrets
+      autoload :Location, 'foreplay/engine/secrets/location'
+
       attr_reader :environment, :secret_locations
 
       def initialize(e, sl)

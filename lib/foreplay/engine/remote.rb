@@ -1,12 +1,15 @@
 require 'net/ssh'
 require 'net/ssh/shell'
 
-require 'foreplay/engine/remote/check'
-require 'foreplay/engine/remote/step'
+#- require 'foreplay/engine/remote/check'
+#- require 'foreplay/engine/remote/step'
 
 module Foreplay
   class Engine
     class Remote
+      autoload :Check, 'foreplay/engine/remote/check'
+      autoload :Step, 'foreplay/engine/remote/step'
+
       include Foreplay
       attr_reader :server, :steps, :instructions
 

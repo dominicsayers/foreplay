@@ -1,8 +1,9 @@
-require 'foreplay/version'
-require 'foreplay/engine'
-require 'foreplay/launcher'
-
 module Foreplay
+  autoload :VERSION, 'foreplay/version'
+  autoload :Engine, 'foreplay/engine'
+  autoload :Launcher, 'foreplay/launcher'
+  autoload :Setup, 'foreplay/setup'
+
   DEFAULT_PORT = 50_000
   PORT_GAP = 1_000
 
@@ -27,8 +28,7 @@ class Hash
   #   h1.supermerge(h2)
   #   #=> {:x=>{:y=>[4, 5, 6, 7, 8, 9]}, :z=>[7, 8, 9, "xyz"]}
   def supermerge(other_hash)
-    fail 'supermerge only works if you pass a hash. '\
-      "You passed a #{self.class} and a #{other_hash.class}." unless other_hash.is_a?(Hash)
+    fail "supermerge needs a Hash, not a #{other_hash.class}." unless other_hash.is_a?(Hash)
 
     new_hash = deep_dup
 
@@ -67,5 +67,22 @@ class String
 
   def fake_erb
     gsub(/(<%=\s+([^%]+)\s+%>)/) { |e| eval "_ = #{e.split[1]}" }
+  end
+
+  def escape_double_quotes
+    gsub('"', '\\"')
+  end
+
+  def remove_trailing_newline
+    gsub(/\n\z/, '')
+  end
+end
+
+require 'yaml'
+
+module YAML
+  # Escape string so it's safe for a YAML value
+  def self.escape(string)
+    /^---\n__: ([^\n]*)$/.match(Psych.dump('__' => string))[1]
   end
 end

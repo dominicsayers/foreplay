@@ -1,6 +1,3 @@
-require 'spec_helper'
-require 'foreplay'
-
 describe Hash do
   context '#supermerge' do
     it 'should complain unless two hashes are passed to it' do

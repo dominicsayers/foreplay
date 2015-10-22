@@ -31,14 +31,14 @@
   suffix:       '.yml'
   commentary:   'Building config/database.yml'
   before:       '  '
-  header:       "<%= environment %>:"
+  header:       "<%= environment %>"
   path:         'config/'
 - key:          'application'
   delimiter:    ': '
   suffix:       '.yml'
   commentary:   'Building config/application.yml'
   before:       '  '
-  header:       "<%= environment %>:"
+  header:       "<%= environment %>"
   path:         'config/'
 - key:          'resque'
   delimiter:    ': '
@@ -67,20 +67,6 @@
   commentary:   "Setting the port for the new instance to <%= current_port %>"
 - command:      'sleep 60'
   commentary:   'Waiting 60s to give service time to start'
-- command:      "sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port <%= current_port %>"
-  commentary:   "Adding firewall rule to direct incoming traffic on port 80 to port <%= current_port %>"
-- command:      "sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port <%= former_port %>"
-  commentary:   "Removing previous firewall rule directing traffic to port <%= former_port %>"
-  ignore_error: true
-- command:      'sudo iptables-save > /etc/iptables/rules.v4'
-  commentary:   'Attempting to save firewall rules to /etc/iptables/rules.v4'
-  ignore_error: true
-- command:      'sudo iptables-save > /etc/iptables.up.rules'
-  commentary:   'Attempting to save firewall rules to /etc/iptables.up.rules'
-  ignore_error: true
-- command:      'sudo iptables-save -c | egrep REDIRECT --color=never'
-  ignore_error: true
-  commentary:   'Current firewall NAT configuration:'
 - command:      "sudo stop <%= former_service %> || echo 'No previous instance running'"
   commentary:   'Stopping the previous instance'
   ignore_error: true

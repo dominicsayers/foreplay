@@ -21,7 +21,7 @@ module Foreplay
         @formatted_message ||= header + message
                                         .gsub(/\A\s+/, '')
                                         .gsub(/\s+\z/, '')
-                                        .gsub(/(\r\n|\r|\n)/, "\\1#{margin}")
+                                        .gsub(/(\r\n|\r|\n)/, "\n#{margin}")
       end
 
       def header

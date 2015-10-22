@@ -8,18 +8,16 @@ module Foreplay
         @host = h
         @step = s
         @instructions = i
+        @redirect = false
       end
 
       def commands
         return @commands if @commands
+        @commands = []
 
         # Each step can be (1) a command or (2) a series of values to add to a file
         if step.key?('key')
-          if instructions.key?(step['key'])
-            build_commands
-          else
-            @commands = []
-          end
+          build_commands if instructions.key?(step['key'])
         else
           # ...or just execute the command specified
           @commands = [command]
@@ -29,23 +27,29 @@ module Foreplay
       end
 
       def build_commands
-        step['silent'] = true
-
-        if header?
-          @commands  = ["echo \"#{header}\" > #{filename}"]
-          redirect
-        else
-          @commands  = []
-        end
-
-        if instructions[key].is_a? Hash
-          build_commands_from_hash
-        else
-          build_commands_from_string
-        end
+        step['silent'] = !instructions.key?('verbose')
+        instructions[key].is_a?(Hash) ? build_commands_from_hash : build_commands_from_string
       end
 
       def build_commands_from_hash
+        delimiter == ': ' ? build_commands_from_hash_to_yaml : build_commands_from_hash_to_env
+      end
+
+      def build_commands_from_hash_to_yaml
+        instructions_yaml.each_line do |l|
+          @commands << "echo \"#{l.remove_trailing_newline.escape_double_quotes}\" #{redirect} #{filename}"
+        end
+      end
+
+      def instructions_hash
+        header? ? {  header => instructions[key] } : instructions[key]
+      end
+
+      def instructions_yaml
+        YAML.dump instructions_hash
+      end
+
+      def build_commands_from_hash_to_env
         instructions[key].each do |k, v|
           @commands << "echo \"#{before}#{k}#{delimiter}#{v}#{after}\" #{redirect} #{filename}"
         end
@@ -56,12 +60,9 @@ module Foreplay
       end
 
       def redirect
-        if @redirect
-          '>>'
-        else
-          @redirect = true
-          '>'
-        end
+        arrow = @redirect ? '>>' : '>'
+        @redirect = true
+        arrow
       end
 
       def command
@@ -108,13 +109,13 @@ module Foreplay
         header.present?
       end
 
-      def silent
+      def silent?
         @silent ||= step['silent']
       end
 
       def announce
-        log "#{(step['commentary'] || command).yellow}", host: host, silent: silent
-        log command.cyan, host: host, silent: silent if instructions['verbose'] && step['commentary'] && command
+        log "#{(step['commentary'] || command).yellow}", host: host, silent: silent?
+        log command.cyan, host: host, silent: silent? if instructions['verbose'] && step['commentary'] && command
       end
     end
   end

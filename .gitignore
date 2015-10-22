@@ -1,3 +1,5 @@
+Gemfile.lock
+.ruby-version
 .ruby-gemset
 ._*
 .DS_Store
@@ -7,7 +9,6 @@
 *.sassc
 .sass-cache
 capybara-*.html
-.rspec
 .env
 /.bundle
 /vendor/bundle

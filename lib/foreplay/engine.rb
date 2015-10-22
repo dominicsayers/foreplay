@@ -1,22 +1,23 @@
-require 'yaml'
-
-require 'foreplay/engine/defaults'
-require 'foreplay/engine/logger'
-require 'foreplay/engine/port'
-require 'foreplay/engine/remote'
-require 'foreplay/engine/role'
-require 'foreplay/engine/secrets'
-require 'foreplay/engine/server'
-require 'foreplay/engine/step'
-
 module Foreplay
   class Engine
+    autoload :Defaults, 'foreplay/engine/defaults'
+    autoload :Logger, 'foreplay/engine/logger'
+    autoload :Port, 'foreplay/engine/port'
+    autoload :Remote, 'foreplay/engine/remote'
+    autoload :Role, 'foreplay/engine/role'
+    autoload :Secrets, 'foreplay/engine/secrets'
+    autoload :Server, 'foreplay/engine/server'
+    autoload :Step, 'foreplay/engine/step'
+
     include Foreplay::Engine::Defaults
     attr_reader :mode, :environment, :filters
 
     def initialize(e, f)
       @environment  = e
       @filters      = f
+
+      @defaults = nil
+      @roles_all = nil
     end
 
     [:deploy, :check].each { |m| define_method(m) { execute m } }

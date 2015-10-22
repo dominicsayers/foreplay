@@ -1,6 +1,3 @@
-require 'spec_helper'
-require 'foreplay'
-
 describe Foreplay::Engine::Secrets do
   context '#fetch' do
     it 'returns nil if there is no secret location' do
@@ -29,11 +26,11 @@ describe Foreplay::Engine::Secrets do
     let(:secret) { Foreplay::Engine::Secrets.new('', ['x']) }
 
     before :each do
-      allow(secret).to receive(:fetch_from).and_return(secrets)
+      allow(secret).to receive(:location_secrets).and_return(secrets)
     end
 
     it 'does what it is told' do
-      expect(secret.fetch_from).to eq(secrets)
+      expect(secret.location_secrets).to eq(secrets)
     end
 
     it 'returns a hash of secrets' do
@@ -48,11 +45,22 @@ describe Foreplay::Engine::Secrets do
     let(:secret) { Foreplay::Engine::Secrets.new('', %w(x x)) }
 
     before :each do
-      allow(secret).to receive(:fetch_from).and_return(secrets1, secrets2)
+      allow(secret).to receive(:location_secrets).and_return(secrets1, secrets2)
     end
 
     it 'returns a hash of secrets' do
       expect(secret.fetch).to eq(secrets)
+    end
+  end
+
+  context 'Location returns a hash if one is found' do
+    let(:location) { Foreplay::Engine::Secrets::Location.new('', 'p') }
+    let(:secrets) { { 'p' => { 'a' => 'x', 'b' => 'y', 'c' => 'z' }, 'q' => 'zzz', 'r' => { 'd' => 1 } } }
+
+    before { allow(location).to receive(:all_secrets).and_return(secrets) }
+
+    it 'returns the secrets for the right environment' do
+      expect(location.secrets).to eq(secrets['p'])
     end
   end
 end

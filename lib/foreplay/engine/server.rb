@@ -9,6 +9,11 @@ module Foreplay
         @mode         = m
         @instructions = i
         @server       = s
+
+        @path = nil
+        @host = nil
+        @port_details = nil
+        @current_port_remote = nil
       end
 
       def execute

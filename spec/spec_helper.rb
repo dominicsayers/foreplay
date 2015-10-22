@@ -10,7 +10,7 @@ unless ENV['NO_SIMPLECOV']
     SimpleCov.coverage_dir(dir)
   end
 
-  SimpleCov.start(:rails)
+  SimpleCov.start
   Coveralls.wear!('rails') if ENV['COVERALLS_REPO_TOKEN']
 end
 

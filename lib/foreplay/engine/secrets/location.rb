@@ -26,6 +26,7 @@ module Foreplay
             log 'No secrets found'
             url ? log("Looked in #{url}") : log('No url found')
             log("Secrets #{all_secrets.key?(environment) ? 'has a' : 'has no'} key #{environment}") if all_secrets
+            log all_secrets.inspect if all_secrets
             @secrets = {}
           end
         end
@@ -35,7 +36,7 @@ module Foreplay
 
           @all_secrets = url ? YAML.load(`#{command}`) : {}
         rescue Psych::SyntaxError => e
-          log "Exception caught when loading secrets using this command: #{command}"
+          log "Exception caught when loading secrets from this location: #{url}"
           log "#{e.class}: #{e.message}".red
           @all_secrets = {}
         end

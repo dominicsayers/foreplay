@@ -23,8 +23,7 @@ module Foreplay
             log "Unexpected secrets found: #{@secrets}"
             @secrets = {}
           else
-            log 'No secrets found'
-            url ? log("Looked in #{url}") : log('No url found')
+            url ? log("No secrets found at #{url}") : log('No url for secrets found')
             log("Secrets #{all_secrets.key?(environment) ? 'has a' : 'has no'} key #{environment}") if all_secrets
             @secrets = {}
           end
@@ -41,11 +40,7 @@ module Foreplay
         end
 
         def raw_secrets
-          return @raw_secrets if @raw_secrets
-          @raw_secrets = `#{command}`
-          log command
-          log @raw_secrets
-          @raw_secrets
+          @raw_secrets ||= `#{command}`
         end
 
         def command

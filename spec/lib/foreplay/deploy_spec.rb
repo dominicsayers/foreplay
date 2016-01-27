@@ -153,7 +153,7 @@ describe Foreplay::Launcher do
       'echo "---" > config/application.yml',
       'echo "production:" >> config/application.yml',
       'echo "  BIG_SECRET: \'123\'" >> config/application.yml',
-      'echo "  MOUSTACHE: ! \'{{moustache}}\'" >> config/application.yml',
+      'echo "  MOUSTACHE: \"{{moustache}}\"" >> config/application.yml',
       'echo "---" > .foreman',
       'echo "concurrency: web=1,worker=0,scheduler=0" >> .foreman',
       'echo "app: foreplay-50000" >> .foreman',

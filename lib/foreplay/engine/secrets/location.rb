@@ -15,11 +15,17 @@ module Foreplay
 
           @secrets = all_secrets[environment]
 
-          if @secrets.is_a? Hash
+          case @secrets
+          when Hash
             log "Loaded #{secrets.keys.length} secrets"
             @secrets
+          when String
+            log "Unexpected secrets found: #{@secrets}"
+            @secrets = {}
           else
             log 'No secrets found'
+            url ? log("Looked in #{url}") : log('No url found')
+            log("Secrets #{all_secrets.key?(environment) ? 'has a' : 'has no'} key #{environment}") if all_secrets
             @secrets = {}
           end
         end

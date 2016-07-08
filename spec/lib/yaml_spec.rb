@@ -1,7 +1,7 @@
 describe YAML do
   context '#escape' do
     it 'uses the expected Ruby version' do
-      expect(RUBY_VERSION).to eq '2.1.6'
+      expect(RUBY_VERSION).to eq '2.1.9'
     end
 
     it 'uses the expected YAML version' do

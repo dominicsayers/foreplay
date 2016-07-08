@@ -32,8 +32,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'coveralls', '~> 0.8'
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 0.4'
   spec.add_development_dependency 'rubocop', '~> 0.30'
-  spec.add_development_dependency 'guard', '~> 2.7'
-  spec.add_development_dependency 'guard-rspec', '~> 4.3'
+  spec.add_development_dependency 'listen', '~> 3.0', '< 3.1' # Dependency of guard, 3.1 requires Ruby 2.2+
+  spec.add_development_dependency 'guard', '~> 2'
+  spec.add_development_dependency 'guard-rspec', '~> 4'
   spec.add_development_dependency 'guard-rubocop', '~> 1.2'
   spec.add_development_dependency 'guard-cucumber', '~> 1.6'
 end

@@ -58,7 +58,7 @@
   commentary:   'Caching bundle'
 - command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets" ; else RAILS_ENV=<%= environment %> /usr/bin/bundle exec foreman run rake assets:precompile ; fi'
   commentary:   'Precompiling assets unless they were supplied'
-- command:      'sudo /usr/bin/bundle exec foreman export upstart /etc/init'
+- command:      'sudo /usr/bin/bundle exec foreman export upstart<%= concurrency %> /etc/init'
   commentary:   "Converting <%= current_service %> to an upstart service"
 - command:      "sudo start <%= current_service %> || sudo restart <%= current_service %>"
   commentary:   'Starting the service'

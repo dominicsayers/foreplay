@@ -71,6 +71,8 @@ module Foreplay
       end
 
       def steps
+        concurrency = foreman.key?('concurrency') ? " -m #{foreman['concurrency']}" : ''
+
         @steps ||= YAML.load(
           ERB.new(
             File.read(

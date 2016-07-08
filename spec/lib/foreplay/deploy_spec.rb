@@ -178,7 +178,7 @@ describe Foreplay::Launcher do
       'rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
       ' ; else RAILS_ENV=production /usr/bin/bundle exec foreman run rake assets:precompile ; fi',
-      'sudo /usr/bin/bundle exec foreman export upstart /etc/init',
+      'sudo /usr/bin/bundle exec foreman export upstart -m web=1,worker=0,scheduler=0 /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',
       'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
       'echo 50000 > $HOME/.foreplay/foreplay/current_port',

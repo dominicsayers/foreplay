@@ -173,7 +173,7 @@ describe Foreplay::Launcher do
       ' ; else echo No bundle to restore ; fi',
       'gem install bundler -v "> 1.8"',
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
-      '/usr/bin/bundle install --deployment --clean --jobs 2 --without development test',
+      '/usr/bin/bundle install --deployment --clean --full-index --jobs 2 --without development test',
       'mkdir -p ../cache/vendor && '\
       'rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\

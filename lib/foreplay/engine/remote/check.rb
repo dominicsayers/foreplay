@@ -13,7 +13,7 @@ module Foreplay
 
         def perform
           steps.each do |step|
-            log "#{(step['commentary'] || step['command']).yellow}", host: host, silent: step['silent']
+            log (step['commentary'] || step['command']).yellow.to_s, host: host, silent: step['silent']
 
             if step.key? 'key'
               list_file_contents step['key']

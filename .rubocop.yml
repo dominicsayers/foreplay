@@ -44,3 +44,7 @@ MethodLength:
 
 AbcSize:
   Max: 21 # 23 # 62
+
+CyclomaticComplexity:
+  Max: 7
+

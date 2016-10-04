@@ -19,9 +19,9 @@ module Foreplay
 
       def formatted_message
         @formatted_message ||= header + message
-                                        .gsub(/\A\s+/, '')
-                                        .gsub(/\s+\z/, '')
-                                        .gsub(/(\r\n|\r|\n)/, "\n#{margin}")
+                               .gsub(/\A\s+/, '')
+                               .gsub(/\s+\z/, '')
+                               .gsub(/(\r\n|\r|\n)/, "\n#{margin}")
       end
 
       def header

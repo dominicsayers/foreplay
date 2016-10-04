@@ -12,7 +12,7 @@ module Foreplay
   end
 
   def terminate(message)
-    fail message
+    raise message
   end
 end
 
@@ -28,20 +28,20 @@ class Hash
   #   h1.supermerge(h2)
   #   #=> {:x=>{:y=>[4, 5, 6, 7, 8, 9]}, :z=>[7, 8, 9, "xyz"]}
   def supermerge(other_hash)
-    fail "supermerge needs a Hash, not a #{other_hash.class}." unless other_hash.is_a?(Hash)
+    raise "supermerge needs a Hash, not a #{other_hash.class}." unless other_hash.is_a?(Hash)
 
     new_hash = deep_dup
 
     other_hash.each_pair do |k, v|
       tv = new_hash[k]
 
-      if tv.is_a?(Hash) && v.is_a?(Hash)
-        new_hash[k] = tv.supermerge(v)
-      elsif tv.is_a?(Array) || v.is_a?(Array)
-        new_hash[k] = Array.wrap(tv) + Array.wrap(v)
-      else
-        new_hash[k] = v
-      end
+      new_hash[k] = if tv.is_a?(Hash) && v.is_a?(Hash)
+                      tv.supermerge(v)
+                    elsif tv.is_a?(Array) || v.is_a?(Array)
+                      Array.wrap(tv) + Array.wrap(v)
+                    else
+                      v
+                    end
     end
 
     new_hash

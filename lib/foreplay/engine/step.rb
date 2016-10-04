@@ -114,7 +114,7 @@ module Foreplay
       end
 
       def announce
-        log "#{(step['commentary'] || command).yellow}", host: host, silent: silent?
+        log (step['commentary'] || command).yellow.to_s, host: host, silent: silent?
         log command.cyan, host: host, silent: silent? if instructions['verbose'] && step['commentary'] && command
       end
     end

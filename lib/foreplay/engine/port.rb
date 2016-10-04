@@ -51,7 +51,7 @@ module Foreplay
                                .strip
                                .to_i
 
-        if @current_port_remote == 0
+        if @current_port_remote.zero?
           message = 'No instance is currently deployed'
           @current_port_remote = DEFAULT_PORT + PORT_GAP
         else

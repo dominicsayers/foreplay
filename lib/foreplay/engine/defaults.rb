@@ -3,8 +3,8 @@ module Foreplay
     module Defaults
       include Foreplay
 
-      DEFAULT_CONFIG_FILE = "#{Dir.getwd}/config/foreplay.yml"
-      DEFAULTS_KEY        = 'defaults'
+      DEFAULT_CONFIG_FILE = "#{Dir.getwd}/config/foreplay.yml".freeze
+      DEFAULTS_KEY        = 'defaults'.freeze
 
       def defaults
         return @defaults if @defaults

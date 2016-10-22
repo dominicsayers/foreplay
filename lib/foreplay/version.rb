@@ -1,3 +1,3 @@
 module Foreplay
-  VERSION = '0.15.4'.freeze
+  VERSION = '0.16.0'.freeze
 end

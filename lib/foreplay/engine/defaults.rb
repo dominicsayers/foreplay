@@ -14,7 +14,8 @@ module Foreplay
         @defaults = {
           'name'            =>  File.basename(Dir.getwd),
           'environment'     =>  environment,
-          'port'            =>  DEFAULT_PORT
+          'port'            =>  DEFAULT_PORT,
+          'config'          =>  []
         }
 
         @defaults['env'] = secrets

@@ -141,8 +141,9 @@ describe Foreplay::Launcher do
       'rvm rvmrc warning ignore 50000',
       'gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys D39DC0E3',
       'cd 50000 && mkdir -p tmp doc log config',
-      'rvm rvmrc load && rvm info',
+      'if [ 1 ] ; then env ; fi',
       'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
+      'if [ 1 ] ; then rvm rvmrc load && rvm info ; fi',
       'echo "BIG_SECRET=123" > .env',
       'echo "MOUSTACHE={{moustache}}" >> .env',
       'echo "HOME=$HOME" >> .env',
@@ -172,6 +173,7 @@ describe Foreplay::Launcher do
       'rsync -aW --no-compress --delete --info=STATS1 ../cache/vendor/bundle/ vendor/bundle'\
       ' ; else echo No bundle to restore ; fi',
       'gem install bundler -v "> 1.8"',
+      "if [  ] ; then sudo stop foreplay-51000 || echo 'No previous instance running' ; fi",
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
       '/usr/bin/bundle install --deployment --clean --full-index --jobs 2 --without development test',
       'mkdir -p ../cache/vendor && '\

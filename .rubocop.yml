@@ -1,6 +1,10 @@
 ---
-# These are OK:
+AllCops:
+  Exclude:
+    - '*.gemspec'
+    - 'spec/**/*'
 
+# These are OK:
 StringLiterals:
   EnforcedStyle: single_quotes
   Enabled: true

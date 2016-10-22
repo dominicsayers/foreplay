@@ -80,6 +80,7 @@ production:
     foreman:
       concurrency: 'web=1,worker_immediate=2,worker_longjobs=1,scheduler=1,resque_web=1,new_relic_resque=1'
   auxiliary:
+    config: ['stop_first'] # It runs out of memory unless I stop the service before asset precompile
     servers: [bradman.xenapto.net,edrich.xenapto.net:10022]
     foreman:
       concurrency: 'worker_regular=8'
@@ -101,6 +102,7 @@ A quick walk-though of this configuration:
 6.  Each role contains a list of servers and any overrides to the default settings
 7.  For instance the `web` role is deployed to `sandham.xenapto.net`. For that server the database is on the same machine (`localhost`). The Foreman `concurrency` setting defines which workers from my Procfile are launched on that server.
 8.  Note that in the `auxiliary` role I am deploying to two servers. On the second (`edrich.xenapto.net`) I'm using port 10022 for SSH instead of the default.
+9.  Precompiling assets uses a lot of memory. On these servers I get Out Of Memory errors unless I shut down my app first.
 
 General format:
 
@@ -113,6 +115,7 @@ defaults:       # global defaults for all environments
   keyfile:      # or a file containing a private key that allows the named user access to the server
   key:          # ...or a private key that allows the named user access to the server
   path:         # absolute path to deploy the app on each server. %s will substitute to the app name
+  config:       # Configuration parameters to change the behaviour of Foreplay
   database:     # the database.yml elements to write to the config folder
   env:          # contents of the .env file
     key: value  # will go into the .env file as key=value

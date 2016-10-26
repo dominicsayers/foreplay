@@ -52,12 +52,12 @@
   commentary:   'Updating the bundler version'
 - command:      'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle'
   commentary:   'Setting the current version of bundle to be the default'
+- command:      "if [ <%= instructions['config'].include?('stop_first') ? '1' : '' %> ] ; then sudo stop <%= former_service %> || echo 'No previous instance running' ; fi"
+  commentary:   'Stopping the previous instance'
 - command:      '/usr/bin/bundle install --deployment --clean --full-index --jobs 2 --without development test'
   commentary:   'Using bundler to install the required gems in deployment mode'
 - command:      'mkdir -p ../cache/vendor && rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle'
   commentary:   'Caching bundle'
-- command:      "if [ <%= instructions['config'].include?('stop_first') ? '1' : '' %> ] ; then sudo stop <%= former_service %> || echo 'No previous instance running' ; fi"
-  commentary:   'Stopping the previous instance'
 - command:      'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets" ; else RAILS_ENV=<%= environment %> /usr/bin/bundle exec foreman run rake assets:precompile ; fi'
   commentary:   'Precompiling assets unless they were supplied'
 - command:      'sudo /usr/bin/bundle exec foreman export upstart<%= concurrency %> /etc/init'

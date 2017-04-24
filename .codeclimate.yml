@@ -6,7 +6,7 @@ engines:
       languages:
       - ruby
   fixme:
-    enabled: true
+    enabled: false # Too many permanent TODOs included in the templates
   rubocop:
     enabled: true
 ratings:

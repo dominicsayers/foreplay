@@ -129,7 +129,7 @@ describe Foreplay::Launcher do
 
     expect(Net::SSH)
       .to(receive(:start))
-      .with(/web[12].example.com/, 'fred',  verbose: :warn, port: 22, password: 'trollope')
+      .with(/web[12].example.com/, 'fred', verbose: :warn, port: 22, password: 'trollope')
       .exactly(4).times
       .and_return(session)
 

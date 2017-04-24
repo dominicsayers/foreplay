@@ -12,9 +12,9 @@ Gem::Specification.new do |s|
   s.homepage      = 'https://github.com/dominicsayers/foreplay'
   s.license       = 'MIT'
 
-  s.files = `git ls-files`.split($RS).reject { |file| file =~ /^spec\// }
+  s.files = `git ls-files`.split($RS).reject { |file| file =~ %r{^spec/} }
   s.test_files = []
-  s.executables   = s.files.grep(%r{^bin\/}) { |f| File.basename(f) }
+  s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.require_paths = ['lib']
 
   s.add_runtime_dependency 'foreman', '>= 0.76', '< 1.0'

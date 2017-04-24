@@ -42,7 +42,7 @@ describe Foreplay::Engine::Secrets do
     let(:secrets1) { { 'a' => 'x', 'b' => 'f' } }
     let(:secrets2) { { 'b' => 'y', 'c' => 'z' } }
     let(:secrets) { { 'a' => 'x', 'b' => 'y', 'c' => 'z' } }
-    let(:secret) { Foreplay::Engine::Secrets.new('', %w(x x)) }
+    let(:secret) { Foreplay::Engine::Secrets.new('', %w[x x]) }
 
     before :each do
       allow(secret).to receive(:location_secrets).and_return(secrets1, secrets2)

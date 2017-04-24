@@ -50,7 +50,7 @@ end
 
 # Some useful additions to the String class
 class String
-  colors = %w(black red green yellow blue magenta cyan white)
+  colors = %w[black red green yellow blue magenta cyan white]
 
   colors.each_with_index do |fg_color, i|
     fg = 30 + i
@@ -66,7 +66,7 @@ class String
   end
 
   def fake_erb
-    gsub(/(<%=\s+([^%]+)\s+%>)/) { |e| eval "_ = #{e.split[1]}" }
+    gsub(/(<%=\s+([^%]+)\s+%>)/) { |e| eval "_ = #{e.split[1]}" } # rubocop:disable Security/Eval
   end
 
   def escape_double_quotes

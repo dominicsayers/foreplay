@@ -37,7 +37,7 @@ module Foreplay
       def roles_all
         return @roles_all if @roles_all
 
-        @roles_all = YAML.load(File.read(config_file))
+        @roles_all = YAML.safe_load(File.read(config_file))
 
         # This environment
         unless @roles_all.key? environment

@@ -81,10 +81,12 @@ module Foreplay
         keyfile = instructions['keyfile']
         keyfile.sub! '~', ENV['HOME'] || '/' unless keyfile.blank? # Remote shell won't expand this for us
 
-        terminate(
-          'No authentication methods supplied. '\
-          'You must supply a private key, key file or password in the configuration file'
-        ) if keyfile.blank?
+        if keyfile.blank?
+          terminate(
+            'No authentication methods supplied. '\
+            'You must supply a private key, key file or password in the configuration file'
+          )
+        end
 
         # Get the key from the key file
         log "Using private key from #{keyfile}"

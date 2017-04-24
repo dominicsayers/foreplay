@@ -32,7 +32,7 @@ module Foreplay
         def all_secrets
           return @all_secrets if @all_secrets
 
-          @all_secrets = url ? YAML.load(raw_secrets) : {}
+          @all_secrets = url ? YAML.safe_load(raw_secrets) : {}
         rescue Psych::SyntaxError => e
           log "Exception caught when loading secrets from this location: #{url}"
           log "#{e.class}: #{e.message}".red

@@ -42,7 +42,7 @@ module Foreplay
       end
 
       def instructions_hash
-        header? ? {  header => instructions[key] } : instructions[key]
+        header? ? { header => instructions[key] } : instructions[key]
       end
 
       def instructions_yaml

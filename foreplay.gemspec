@@ -5,11 +5,11 @@ require 'foreplay/version'
 Gem::Specification.new do |s|
   s.name          = 'foreplay'
   s.version       = Foreplay::VERSION
-  s.authors       = ['Xenapto']
-  s.email         = ['developers@xenapto.com']
+  s.authors       = ['Dominic Sayers']
+  s.email         = ['dominic@sayers.cc']
   s.description   = 'Deploying Rails projects to Ubuntu using Foreman'
   s.summary       = 'Example: foreplay deploy production'
-  s.homepage      = 'https://github.com/Xenapto/foreplay'
+  s.homepage      = 'https://github.com/dominicsayers/foreplay'
   s.license       = 'MIT'
 
   s.files = `git ls-files`.split($RS).reject { |file| file =~ /^spec\// }

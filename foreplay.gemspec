@@ -19,5 +19,5 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'foreman', '>= 0.76', '< 1.0'
   s.add_runtime_dependency 'ssh-shell', '>= 0.4', '< 1.0'
-  s.add_runtime_dependency 'activesupport', '>= 3.2', '< 5.0'
+  s.add_runtime_dependency 'activesupport', '>= 3.2.22', '< 5.0'
 end

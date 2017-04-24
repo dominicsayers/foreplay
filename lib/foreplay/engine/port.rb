@@ -21,9 +21,10 @@ module Foreplay
         @current_service ||= port_details['current_service']
       end
 
-      def former_port
-        @former_port ||= port_details['former_port']
-      end
+      # Not apparently used
+      #- def former_port
+      #-   @former_port ||= port_details['former_port']
+      #- end
 
       def former_service
         @former_service ||= port_details['former_service']

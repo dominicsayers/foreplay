@@ -1,13 +1,5 @@
 describe YAML do
   context '#escape' do
-    it 'uses the expected Ruby version' do
-      expect(RUBY_VERSION).to eq '2.1.10'
-    end
-
-    it 'uses the expected YAML version' do
-      expect(YAML::VERSION).to eq '2.0.5' # The escaping below changes with different YAML versions
-    end
-
     it 'correctly escape a basic string' do
       expect(YAML.escape('brian')).to eq('brian')
     end

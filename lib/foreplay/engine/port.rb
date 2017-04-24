@@ -21,9 +21,10 @@ module Foreplay
         @current_service ||= port_details['current_service']
       end
 
-      def former_port
-        @former_port ||= port_details['former_port']
-      end
+      # Not apparently used
+      #- def former_port
+      #-   @former_port ||= port_details['former_port']
+      #- end
 
       def former_service
         @former_service ||= port_details['former_service']
@@ -51,7 +52,7 @@ module Foreplay
                                .strip
                                .to_i
 
-        if @current_port_remote == 0
+        if @current_port_remote.zero?
           message = 'No instance is currently deployed'
           @current_port_remote = DEFAULT_PORT + PORT_GAP
         else

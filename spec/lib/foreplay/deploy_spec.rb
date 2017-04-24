@@ -129,7 +129,7 @@ describe Foreplay::Launcher do
 
     expect(Net::SSH)
       .to(receive(:start))
-      .with(/web[12].example.com/, 'fred',  verbose: :warn, port: 22, password: 'trollope')
+      .with(/web[12].example.com/, 'fred', verbose: :warn, port: 22, password: 'trollope')
       .exactly(4).times
       .and_return(session)
 
@@ -141,8 +141,9 @@ describe Foreplay::Launcher do
       'rvm rvmrc warning ignore 50000',
       'gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys D39DC0E3',
       'cd 50000 && mkdir -p tmp doc log config',
-      'rvm rvmrc load && rvm info',
+      'if [ 1 ] ; then env ; fi',
       'if [ -f .ruby-version ] ; then rvm install `cat .ruby-version` ; else echo "No .ruby-version file found" ; fi',
+      'if [ 1 ] ; then rvm rvmrc load && rvm info ; fi',
       'echo "BIG_SECRET=123" > .env',
       'echo "MOUSTACHE={{moustache}}" >> .env',
       'echo "HOME=$HOME" >> .env',
@@ -153,7 +154,7 @@ describe Foreplay::Launcher do
       'echo "---" > config/application.yml',
       'echo "production:" >> config/application.yml',
       'echo "  BIG_SECRET: \'123\'" >> config/application.yml',
-      'echo "  MOUSTACHE: ! \'{{moustache}}\'" >> config/application.yml',
+      'echo "  MOUSTACHE: \"{{moustache}}\"" >> config/application.yml',
       'echo "---" > .foreman',
       'echo "concurrency: web=1,worker=0,scheduler=0" >> .foreman',
       'echo "app: foreplay-50000" >> .foreman',
@@ -172,13 +173,14 @@ describe Foreplay::Launcher do
       'rsync -aW --no-compress --delete --info=STATS1 ../cache/vendor/bundle/ vendor/bundle'\
       ' ; else echo No bundle to restore ; fi',
       'gem install bundler -v "> 1.8"',
+      "if [  ] ; then sudo stop foreplay-51000 || echo 'No previous instance running' ; fi",
       'sudo ln -f `which bundle` /usr/bin/bundle || echo Using default version of bundle',
-      '/usr/bin/bundle install --deployment --clean --jobs 2 --without development test',
+      '/usr/bin/bundle install --deployment --clean --full-index --jobs 2 --without development test',
       'mkdir -p ../cache/vendor && '\
       'rsync -aW --no-compress --delete --info=STATS1 vendor/bundle/ ../cache/vendor/bundle',
       'if [ -f public/assets/manifest.yml ] ; then echo "Not precompiling assets"'\
       ' ; else RAILS_ENV=production /usr/bin/bundle exec foreman run rake assets:precompile ; fi',
-      'sudo /usr/bin/bundle exec foreman export upstart /etc/init',
+      'sudo /usr/bin/bundle exec foreman export upstart -m web=1,worker=0,scheduler=0 /etc/init',
       'sudo start foreplay-50000 || sudo restart foreplay-50000',
       'mkdir -p .foreplay/foreplay && touch .foreplay/foreplay/current_port && cat .foreplay/foreplay/current_port',
       'echo 50000 > $HOME/.foreplay/foreplay/current_port',

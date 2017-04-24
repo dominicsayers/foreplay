@@ -3,8 +3,8 @@ module Foreplay
     module Defaults
       include Foreplay
 
-      DEFAULT_CONFIG_FILE = "#{Dir.getwd}/config/foreplay.yml"
-      DEFAULTS_KEY        = 'defaults'
+      DEFAULT_CONFIG_FILE = "#{Dir.getwd}/config/foreplay.yml".freeze
+      DEFAULTS_KEY        = 'defaults'.freeze
 
       def defaults
         return @defaults if @defaults
@@ -14,7 +14,8 @@ module Foreplay
         @defaults = {
           'name'            =>  File.basename(Dir.getwd),
           'environment'     =>  environment,
-          'port'            =>  DEFAULT_PORT
+          'port'            =>  DEFAULT_PORT,
+          'config'          =>  []
         }
 
         @defaults['env'] = secrets
@@ -36,7 +37,7 @@ module Foreplay
       def roles_all
         return @roles_all if @roles_all
 
-        @roles_all = YAML.load(File.read(config_file))
+        @roles_all = YAML.safe_load(File.read(config_file))
 
         # This environment
         unless @roles_all.key? environment

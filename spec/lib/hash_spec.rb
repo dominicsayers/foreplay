@@ -9,11 +9,11 @@ describe Hash do
     end
 
     it 'should merge two hashes both with arrays at the same key' do
-      expect({ a: ['x'] }.supermerge(a: ['y'])).to eq(a: %w(x y))
+      expect({ a: ['x'] }.supermerge(a: ['y'])).to eq(a: %w[x y])
     end
 
     it 'should merge an array and a value at the same key' do
-      expect({ a: 'x' }.supermerge(a: ['y'])).to eq(a: %w(x y))
+      expect({ a: 'x' }.supermerge(a: ['y'])).to eq(a: %w[x y])
     end
 
     it 'should replace a value at the same key' do

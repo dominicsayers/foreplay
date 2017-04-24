@@ -23,7 +23,7 @@ module Foreplay
           process = shell.execute command
           process.on_output { |_, po| o += po }
           shell.wait!
-          terminate(o) unless step['ignore_error'] == true || process.exit_status == 0
+          terminate(o) unless step['ignore_error'] == true || process.exit_status.zero?
           o
         end
 

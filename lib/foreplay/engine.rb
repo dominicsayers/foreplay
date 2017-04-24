@@ -20,7 +20,7 @@ module Foreplay
       @roles_all = nil
     end
 
-    [:deploy, :check].each { |m| define_method(m) { execute m } }
+    %i[deploy check].each { |m| define_method(m) { execute m } }
 
     def execute(m)
       @mode = m
@@ -54,7 +54,7 @@ module Foreplay
       instructions            = defaults.supermerge(additional_instructions)
       instructions['role']    = role
       instructions['verbose'] = verbose
-      required_keys           = %w(name environment role servers path repository)
+      required_keys           = %w[name environment role servers path repository]
 
       required_keys.each do |key|
         next if instructions.key? key

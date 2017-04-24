@@ -1,5 +1,18 @@
 ---
-# These are OK:
+AllCops:
+  TargetRubyVersion: 2.1
+  DisplayCopNames: true
+  Exclude:
+    - 'tmp/**/*'
+
+Style/MixinGrouping:
+  Exclude:
+    - 'spec/**/*.rb'
+
+Metrics/BlockLength:
+  CountComments: false  # count full line comments?
+  Exclude:
+    - '**/*_spec.rb'
 
 StringLiterals:
   EnforcedStyle: single_quotes
@@ -19,23 +32,35 @@ Documentation:
   Description: 'Document classes and non-namespace modules.'
   Enabled: false
 
-Output:
-  Description: 'Checks for calls to puts, print, etc.'
-  Enabled: false
-
-ExtraSpacing:
-  Enabled: false
-
 FileName:
   Description: 'Use snake_case for source file names.'
   Enabled: true
 
-Eval:
-  Enabled: false
-
 LineLength:
   Max: 120
   Enabled: true
+
+Style/ExtraSpacing:
+  Description: 'Do not use unnecessary spacing.'
+  Enabled: true
+
+Lint/LiteralInInterpolation:
+  Description: 'Avoid interpolating literals in strings'
+  AutoCorrect: true
+
+Style/ModuleFunction:
+  EnforcedStyle: extend_self # Allows us to have private methods too
+
+Style/PercentLiteralDelimiters:
+  # Hound and CodeClimate are currently using an old version of Rubocop with
+  # different defaults, so we set them explicitly here.
+  PreferredDelimiters:
+    default: ()
+    '%i': '[]'
+    '%I': '[]'
+    '%r': '{}'
+    '%w': '[]'
+    '%W': '[]'
 
 # Work on these:
 
@@ -44,3 +69,7 @@ MethodLength:
 
 AbcSize:
   Max: 21 # 23 # 62
+
+CyclomaticComplexity:
+  Max: 7
+

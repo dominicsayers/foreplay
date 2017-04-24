@@ -15,11 +15,16 @@ module Foreplay
 
           @secrets = all_secrets[environment]
 
-          if @secrets.is_a? Hash
+          case @secrets
+          when Hash
             log "Loaded #{secrets.keys.length} secrets"
             @secrets
+          when String
+            log "Unexpected secrets found: #{@secrets}"
+            @secrets = {}
           else
-            log 'No secrets found'
+            url ? log("No secrets found at #{url}") : log('No url for secrets found')
+            log("Secrets #{all_secrets.key?(environment) ? 'has a' : 'has no'} key #{environment}") if all_secrets
             @secrets = {}
           end
         end
@@ -27,11 +32,15 @@ module Foreplay
         def all_secrets
           return @all_secrets if @all_secrets
 
-          @all_secrets = url ? YAML.load(`#{command}`) : {}
+          @all_secrets = url ? YAML.safe_load(raw_secrets) : {}
         rescue Psych::SyntaxError => e
-          log "Exception caught when loading secrets using this command: #{command}"
+          log "Exception caught when loading secrets from this location: #{url}"
           log "#{e.class}: #{e.message}".red
           @all_secrets = {}
+        end
+
+        def raw_secrets
+          @raw_secrets ||= `#{command}`
         end
 
         def command

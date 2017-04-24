@@ -1,0 +1,15 @@
+---
+language: ruby
+dist: trusty
+rvm:
+  - 2.4.0
+  - 2.3
+  - 2.2
+  - 2.1
+  # - 2.0 # undefined method `safe_load' for Psych:Module
+before_install:
+  - gem update bundler
+script:
+  - bundle exec rspec
+  - rake features
+after_success: bundle exec codeclimate-test-reporter

@@ -1,4 +1,6 @@
 Gemfile.lock
+*.local
+*.gem
 .ruby-version
 .ruby-gemset
 ._*

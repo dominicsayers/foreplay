@@ -78,7 +78,8 @@ module Foreplay
             File.read(
               "#{File.dirname(__FILE__)}/steps.yml"
             )
-          ).result(binding)
+          ).result(binding),
+          [Date, Symbol, Time], [], true
         )
       end
     end

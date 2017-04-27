@@ -5,7 +5,7 @@ describe Foreplay::Engine::Secrets do
     end
 
     it 'fails if the secret location is not a hash' do
-      expect { Foreplay::Engine::Secrets.new('x', 'y').fetch } .to raise_error(NoMethodError)
+      expect { Foreplay::Engine::Secrets.new('x', 'y').fetch }.to raise_error(NoMethodError)
     end
 
     it 'returns an empty hash if the secret location has no url' do
